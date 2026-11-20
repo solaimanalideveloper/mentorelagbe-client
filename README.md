@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MentorLagbe Client
 
-## Getting Started
+MentorLagbe is a tuition and mentorship platform for students, tutors, and admins. This repository contains the Next.js client.
 
-First, run the development server:
+## Local setup
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Install dependencies with `npm install`.
+2. Copy `.env.example` to `.env.local` and set the API URL and any required public keys.
+3. Run `npm run dev`, then open [http://localhost:3000](http://localhost:3000).
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Protected dashboard pages use the backend BetterAuth session and JWT endpoints. Configure `NEXT_PUBLIC_API_URL` and run the matching MentorLagbe server before signing in.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Purpose |
+| --- | --- |
+| `NEXT_PUBLIC_API_URL` | MentorLagbe server URL |
+| `NEXT_PUBLIC_IMGBB_API_KEY` | ImgBB image upload key |
+| `NEXT_PUBLIC_SITE_URL` | Client site URL |
 
-## Learn More
+## npm packages
 
-To learn more about Next.js, take a look at the following resources:
+Runtime packages: `@base-ui/react`, `@shadcn/react`, `axios`, `better-auth`, `class-variance-authority`, `cmdk`, `cn`, `date-fns`, `embla-carousel-react`, `input-otp`, `lucide-react`, `next`, `react`, `react-day-picker`, `react-dom`, `react-icons`, `react-resizable-panels`, `recharts`, `shadcn`, `shiki`, `sonner`, `tw-animate-css`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Development packages: `@tailwindcss/turbopack`, `@types/node`, `@types/react`, `@types/react-dom`, `babel-plugin-react-compiler`, `eslint`, `eslint-config-next`, `tailwindcss`, `typescript`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Available scripts
 
-## Deploy on Vercel
+- `npm run dev` — start the development server.
+- `npm run lint` — run ESLint.
+- `npm run build` — create a production build.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deployment and test accounts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The production URL and test credentials are not configured in this repository yet. Do not store credentials in this README; share them through a secure channel when available.
+
+Server repository: not configured yet.
