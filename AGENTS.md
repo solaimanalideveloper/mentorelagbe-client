@@ -446,6 +446,8 @@ Project name, purpose, **live URL**, **Admin credentials**, tutor test credentia
 - 2026-11-24 — Matched the student dashboard stats type and display to the server response `{ total, accepted, pending, plan }`.
 - 2026-11-24 — Added a student-segment loading boundary so Next.js can render a useful instant-navigation fallback.
 - 2026-11-24 — Marked session-protected dashboard routes as non-instant at the server layout boundary and added route fallbacks for redirects and admin navigation.
+- 2026-11-24 — Split the admin dashboard into a server route wrapper and client UI, opting out the session-only route from Next.js instant-navigation validation.
+- 2026-11-24 — Added an admin route layout opt-out for Next.js instant-navigation validation, covering `/dashboard/admin/users`, `/dashboard/admin/tuitions`, and `/dashboard/admin/transactions`.
 
 ### Change Log
 
