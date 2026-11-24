@@ -12,7 +12,7 @@ const steps = [
 export default function HowItWorksPage() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-      <SectionHeading title="How MentorLagbe works" subtitle="A clear path from finding the right class to getting started." />
+      <SectionHeading as="h1" title="How MentorLagbe works" subtitle="A clear path from finding the right class to getting started." />
       <section className="mt-10 grid gap-5 md:grid-cols-3">
         {steps.map(({ number, title, text, icon: Icon }) => (
           <article key={number} className="flex h-full flex-col rounded-xl border border-border bg-card p-6 shadow-sm">
@@ -31,8 +31,8 @@ export default function HowItWorksPage() {
           <p className="mt-1 text-sm text-primary-foreground/80">Students can browse classes, and tutors can create a teaching profile.</p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Button variant="secondary" size="lg" render={<Link href="/tuitions" />}>Browse Tuitions <ArrowRight aria-hidden="true" /></Button>
-          <Button variant="outline" size="lg" className="border-primary-foreground/50 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" render={<Link href="/sign-up" />}>Join MentorLagbe</Button>
+          <Button variant="secondary" size="lg" nativeButton={false} render={<Link href="/tuitions" />}>Browse Tuitions <ArrowRight aria-hidden="true" /></Button>
+          <Button variant="outline" size="lg" nativeButton={false} className="border-primary-foreground/50 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" render={<Link href="/sign-up" />}>Join MentorLagbe</Button>
         </div>
       </section>
     </main>

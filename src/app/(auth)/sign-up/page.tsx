@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
+import { clearApiToken, getApiToken } from "@/lib/api";
 
 type SignUpRole = "student" | "tutor";
 
@@ -47,6 +48,8 @@ export default function SignUpPage() {
         return;
       }
 
+      clearApiToken();
+      await getApiToken(true);
       toast.success("Account created successfully.");
       router.replace(`/dashboard/${role}`);
     } catch (error) {

@@ -65,11 +65,11 @@ function VerificationContent() {
       <p className="mt-3 text-sm leading-6 text-muted-foreground">{displayMessage}</p>
       <div className="mt-6 flex flex-wrap justify-center gap-3">
         {displayStatus === "success" ? (
-          <Button size="lg" render={<Link href="/dashboard" />}>Go to Dashboard</Button>
+          <Button size="lg" nativeButton={false} render={<Link href="/dashboard" />}>Go to Dashboard</Button>
         ) : displayStatus === "error" ? (
-          <Button size="lg" variant="outline" render={<Link href="/pricing" />}>Back to Pricing</Button>
+          <Button size="lg" variant="outline" nativeButton={false} render={<Link href="/pricing" />}>Back to Pricing</Button>
         ) : null}
-        <Button size="lg" variant="outline" render={<Link href="/" />}>Home</Button>
+        <Button size="lg" variant="outline" nativeButton={false} render={<Link href="/" />}>Home</Button>
       </div>
     </section>
   );

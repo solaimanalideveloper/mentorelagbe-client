@@ -4,6 +4,7 @@ import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { Toaster } from "sonner";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -28,16 +29,19 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       className={`${inter.variable} ${plusJakartaSans.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
-        <Suspense fallback={null}>
-          <Navbar />
-        </Suspense>
-        <div className="flex-1">{children}</div>
-        <Suspense fallback={null}>
-          <Footer />
-        </Suspense>
-        <Toaster richColors position="top-right" />
+        <ThemeProvider>
+          <Suspense fallback={null}>
+            <Navbar />
+          </Suspense>
+          <div className="flex-1">{children}</div>
+          <Suspense fallback={null}>
+            <Footer />
+          </Suspense>
+          <Toaster richColors position="top-right" />
+        </ThemeProvider>
       </body>
     </html>
   );

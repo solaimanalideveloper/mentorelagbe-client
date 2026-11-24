@@ -66,7 +66,7 @@ Every package used must be listed in README.md.
 ## 3. Environment Variables (`.env.local`)
 
 ```
-NEXT_PUBLIC_API_URL=http://localhost:5000
+NEXT_PUBLIC_API_URL=http://localhost:8000
 NEXT_PUBLIC_IMGBB_API_KEY=
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
@@ -414,8 +414,8 @@ Project name, purpose, **live URL**, **Admin credentials**, tutor test credentia
 - [x] Admin: overview, users, tuitions, transactions
 - [x] Profile page + ImgBB upload
 - [x] loading.tsx / error.tsx / not-found.tsx
-- [ ] Dark/Light toggle (optional)
-- [ ] Bookmarks (optional)
+- [x] Dark/Light toggle (optional)
+- [x] Bookmarks (optional)
 - [ ] Reviews (optional)
 - [ ] Responsive check (mobile/tablet/desktop)
 - [ ] README complete
@@ -436,6 +436,13 @@ Project name, purpose, **live URL**, **Admin credentials**, tutor test credentia
 - 2026-11-19 — Avoided invented learner quotes or subject counts; add those when trusted content/data is available.
 - 2026-11-20 — Used existing API contract routes for public tuition search, applications, tutor/admin workflows, profile, and payment verification; no endpoints were invented.
 - 2026-11-20 — Kept pricing actions role-aware, and used backend idempotent payment verification on the success page.
+- 2026-11-20 — Connected all BetterAuth client methods to the configured backend and require a fresh API JWT before completing sign-in or sign-up.
+- 2026-11-21 — Matched the documented local API URL to the Express server's port 8000.
+- 2026-11-21 — Verified frontend sign-up page, Better Auth session endpoint, and configured backend credentialed CORS.
+- 2026-11-21 — Submitted a unique local student sign-up and confirmed the dashboard session and API JWT were issued.
+- 2026-11-20 — Configured the user-provided local backend URL (`http://localhost:8000`) in the ignored `.env.local` for local testing.
+- 2026-11-20 — Set Base UI `Button` link renders to `nativeButton={false}` to remove runtime warnings while preserving navigation behavior.
+- 2026-11-24 — Added persistent light/dark theme switching and student bookmark state using the existing API contract; kept testimonials and numeric subject counts unclaimed until real content is supplied.
 
 ### Change Log
 
@@ -447,8 +454,17 @@ Project name, purpose, **live URL**, **Admin credentials**, tutor test credentia
 - 2026-11-19 — Added BetterAuth sign-up/sign-in, session guard, JWT-backed tutor stats, tutor overview, and local API setup docs — `src/lib/auth-client.ts`, `src/lib/api.ts`, `src/app/sign-in/`, `src/app/sign-up/`, `src/app/dashboard/`, `src/types/index.ts`, `.env.example`, `README.md`.
 - 2026-11-19 — Replaced the starter home screen with a responsive dashboard-inspired learning workspace, API-backed featured tuitions, pricing/how-it-works/subjects sections, and local hero illustration — `src/app/page.tsx`, `src/components/home/HomeWorkspace.tsx`, `src/components/layout/Navbar.tsx`, `src/app/layout.tsx`, `next.config.ts`, `public/images/learning-session.svg`.
 - 2026-11-20 — Added tuition browsing/details/application, pricing and payment pages, footer, student/tutor/admin/profile workflows, upload helper, and special loading/error/404 states; resolved lint and Next 16 prerender errors — `src/app/`, `src/components/`, `src/lib/data.ts`, `src/lib/imgbb.ts`, `src/types/index.ts`, `src/hooks/use-mobile.ts`, `src/components/ui/carousel.tsx`.
+- 2026-11-20 — Fixed BetterAuth backend URL/client instance wiring, exchanged the session for an API JWT after authentication, and documented required backend configuration — `src/lib/auth-client.ts`, `src/app/(auth)/sign-in/page.tsx`, `src/app/(auth)/sign-up/page.tsx`, `.env.example`, `README.md`.
+- 2026-11-21 — Updated the documented local API default to match the backend's port 8000 — `AGENTS.md`.
+- 2026-11-21 — Confirmed local backend auth and CORS endpoints respond after the backend environment was configured — `.env.local`, `src/lib/auth-client.ts`, `src/app/(auth)/sign-up/page.tsx`.
+- 2026-11-21 — Verified sign-up through browser navigation to the student dashboard and confirmed a valid session and API JWT — `src/app/(auth)/sign-up/page.tsx`, `src/lib/api.ts`.
+- 2026-11-20 — Set the local API base URL to the user-provided `http://localhost:8000` for upcoming backend testing — `.env.local`.
+- 2026-11-20 — Fixed Base UI runtime warning when button-styled navigation links render as anchors — `src/components/layout/Navbar.tsx`, `src/app/tuitions/page.tsx`, `src/app/error.tsx`, `src/app/not-found.tsx`, `src/app/dashboard/student/page.tsx`, `src/app/payment/cancel/page.tsx`, `src/app/dashboard/tutor/post-tuition/page.tsx`, `src/app/how-it-works/page.tsx`, `src/components/tuition/ApplyForm.tsx`, `src/components/payment/PaymentVerification.tsx`.
+- 2026-11-24 — Completed the student saved-tuitions page, added theme switching and reduced-motion-aware home animations, clarified Free/Pro pricing, streamed tuition data behind Suspense, and refreshed setup/package docs — `src/app/`, `src/components/`, `src/app/globals.css`, `next.config.ts`, `package.json`, `package-lock.json`, `README.md`.
 
 ### Open Questions / Blockers
 
 - (Agent: list anything needing the developer's input.)
-- The backend URL and test credentials are not configured in this workspace; set `NEXT_PUBLIC_API_URL` in `.env.local` before exercising authenticated workflows against the server.
+- A unique local student account was created during sign-up verification; session and API JWT work. The student dashboard stats request returns 404 (`/api/student/stats`). Rotate the MongoDB credential and auth/JWT secrets shared in chat.
+- The configured local API at `http://localhost:8000` was unavailable during this turn, so live auth, saved-tuition API behavior, and protected dashboard reloads still need backend-backed verification.
+- Live URL, test-account credentials, and the server repository link were not provided; keep these values out of source control until they are available.

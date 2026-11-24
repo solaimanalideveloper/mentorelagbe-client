@@ -14,6 +14,7 @@ import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import { authClient } from "@/lib/auth-client";
 import { clearApiToken } from "@/lib/api";
 import { toast } from "sonner";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 
 type Role = "student" | "tutor" | "admin";
 
@@ -169,6 +170,7 @@ export default function DashboardLayout({
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <span className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold uppercase text-primary">
               {user.name.slice(0, 1)}
             </span>

@@ -8,7 +8,7 @@ export default function NotFound() {
         <p className="font-heading text-6xl font-bold text-primary">404</p>
         <h1 className="mt-3 font-heading text-2xl font-bold text-foreground">Page not found</h1>
         <p className="mt-2 text-sm text-muted-foreground">The page may have moved or the link may be incorrect.</p>
-        <Button className="mt-6" size="lg" render={<Link href="/" />}>Back to Home</Button>
+        <Button className="mt-6" size="lg" nativeButton={false} render={<Link href="/" />}>Back to Home</Button>
       </section>
     </main>
   );

@@ -22,7 +22,7 @@ export default function ErrorPage({
         <p className="mt-2 text-sm text-muted-foreground">This page could not be loaded. Please try again.</p>
         <div className="mt-6 flex justify-center gap-3">
           <Button size="lg" onClick={reset}>Try Again</Button>
-          <Button size="lg" variant="outline" render={<Link href="/" />}>Back to Home</Button>
+          <Button size="lg" variant="outline" nativeButton={false} render={<Link href="/" />}>Back to Home</Button>
         </div>
       </section>
     </main>

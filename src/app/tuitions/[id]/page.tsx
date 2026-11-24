@@ -1,7 +1,12 @@
+import { Suspense } from "react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ApplyForm } from "@/components/tuition/ApplyForm";
+import { BookmarkButton } from "@/components/tuition/BookmarkButton";
+import { BookmarkProvider } from "@/components/tuition/BookmarkProvider";
 import { formatTaka, isObject, isTuition } from "@/lib/data";
 import type { Tuition } from "@/types";
+import Image from "next/image";
 
 async function getTuition(id: string): Promise<{ tuition: Tuition | null; error: string }> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -22,7 +27,7 @@ async function getTuition(id: string): Promise<{ tuition: Tuition | null; error:
   }
 }
 
-export default async function TuitionDetailsPage({
+async function TuitionDetailsContent({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -33,7 +38,13 @@ export default async function TuitionDetailsPage({
   if (!tuition) {
     return (
       <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <section role="alert" className="rounded-xl border border-destructive/30 bg-destructive/10 p-6 text-destructive">{error}</section>
+        <section role="alert" className="rounded-xl border border-destructive/30 bg-destructive/10 p-6">
+          <h1 className="font-heading text-xl font-bold text-foreground">Could not load this tuition</h1>
+          <p className="mt-2 text-sm text-destructive">{error}</p>
+          <Link href="/tuitions" className="mt-4 inline-flex text-sm font-semibold text-primary hover:underline">
+            Browse all tuitions
+          </Link>
+        </section>
       </main>
     );
   }
@@ -42,8 +53,14 @@ export default async function TuitionDetailsPage({
     <main className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[1fr_360px] lg:px-8">
       <article className="min-w-0">
         {tuition.bannerImage ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={tuition.bannerImage} alt={`${tuition.title} tuition banner`} className="aspect-video w-full rounded-2xl object-cover" />
+          <Image
+            src={tuition.bannerImage}
+            alt={`${tuition.title} tuition banner`}
+            width={1280}
+            height={720}
+            sizes="(max-width: 1024px) 100vw, 66vw"
+            className="aspect-video w-full rounded-2xl object-cover"
+          />
         ) : (
           <div className="flex aspect-video items-center justify-center rounded-2xl bg-primary/10 font-heading text-3xl font-bold text-primary">{tuition.subject}</div>
         )}
@@ -70,10 +87,40 @@ export default async function TuitionDetailsPage({
         </section>
       </article>
       <aside className="h-fit rounded-xl border border-border bg-card p-5 shadow-sm lg:sticky lg:top-24">
-        <h2 className="font-heading text-xl font-bold">Apply for this tuition</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Share your contact details and preferred time.</p>
-        <div className="mt-5"><ApplyForm tuitionId={tuition._id} /></div>
+        <BookmarkProvider>
+          <div className="mb-5 flex justify-end">
+            <BookmarkButton tuition={tuition} />
+          </div>
+          <h2 className="font-heading text-xl font-bold">Apply for this tuition</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Share your contact details and preferred time.</p>
+          <div className="mt-5"><ApplyForm tuitionId={tuition._id} /></div>
+        </BookmarkProvider>
       </aside>
     </main>
+  );
+}
+
+function TuitionDetailsFallback() {
+  return (
+    <main className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[1fr_360px] lg:px-8" role="status" aria-label="Loading tuition details">
+      <div className="space-y-5">
+        <div className="aspect-video animate-pulse rounded-2xl bg-muted" />
+        <div className="h-10 w-3/4 animate-pulse rounded-lg bg-muted" />
+        <div className="h-32 animate-pulse rounded-xl bg-muted" />
+      </div>
+      <div className="h-80 animate-pulse rounded-xl bg-muted" />
+    </main>
+  );
+}
+
+export default function TuitionDetailsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return (
+    <Suspense fallback={<TuitionDetailsFallback />}>
+      <TuitionDetailsContent params={params} />
+    </Suspense>
   );
 }

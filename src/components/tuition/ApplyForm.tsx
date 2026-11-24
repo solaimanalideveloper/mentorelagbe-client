@@ -74,7 +74,7 @@ export function ApplyForm({ tuitionId }: ApplyFormProps) {
     return (
       <div className="rounded-lg border border-border bg-muted/50 p-4">
         <p className="text-sm text-muted-foreground">Sign in as a student to apply for this tuition.</p>
-        <Button className="mt-3" render={<Link href="/sign-in" />}>Sign In</Button>
+        <Button className="mt-3" nativeButton={false} render={<Link href="/sign-in" />}>Sign In</Button>
       </div>
     );
   }

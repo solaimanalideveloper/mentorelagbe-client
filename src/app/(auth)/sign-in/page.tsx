@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
+import { clearApiToken, getApiToken } from "@/lib/api";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -36,6 +37,8 @@ export default function SignInPage() {
         toast.error(message);
         return;
       }
+      clearApiToken();
+      await getApiToken(true);
       toast.success("Signed in successfully.");
       router.replace("/dashboard");
     } catch (error) {

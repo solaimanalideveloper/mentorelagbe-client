@@ -1,14 +1,23 @@
 # MentorLagbe Client
 
-MentorLagbe is a tuition and mentorship platform for students, tutors, and admins. This repository contains the Next.js client.
+MentorLagbe is a tuition and mentorship platform for students, tutors, and admins. This repository contains the responsive Next.js client for browsing tuitions, managing role-based dashboards, and upgrading plans with Stripe Checkout.
+
+## Features
+
+- Browse approved tuitions with server-side search, filters, and pagination.
+- Apply to tuitions as a student and manage student, tutor, and admin workflows.
+- Create and manage tutor listings, including ImgBB image uploads.
+- Compare Free and Pro plans, start Stripe Checkout, and verify completed payments.
+- Save tuition listings, switch between light and dark themes, and use responsive navigation.
+- Authenticate through the MentorLagbe server with BetterAuth sessions and API JWTs.
 
 ## Local setup
 
 1. Install dependencies with `npm install`.
-2. Copy `.env.example` to `.env.local` and set the API URL and any required public keys.
+2. Copy `.env.example` to `.env.local` and set the backend URL and any required public keys.
 3. Run `npm run dev`, then open [http://localhost:3000](http://localhost:3000).
 
-Protected dashboard pages use the backend BetterAuth session and JWT endpoints. Configure `NEXT_PUBLIC_API_URL` and run the matching MentorLagbe server before signing in.
+Authentication and protected dashboard pages use the BetterAuth session and JWT endpoints hosted by the MentorLagbe server. Set `NEXT_PUBLIC_API_URL` to that server's base URL; the server must allow credentialed requests from `NEXT_PUBLIC_SITE_URL` and trust that site as an auth origin before sign-in or sign-up can work. The server must also implement the API contract documented in [AGENTS.md](./AGENTS.md).
 
 ## Environment variables
 
@@ -20,7 +29,7 @@ Protected dashboard pages use the backend BetterAuth session and JWT endpoints. 
 
 ## npm packages
 
-Runtime packages: `@base-ui/react`, `@shadcn/react`, `axios`, `better-auth`, `class-variance-authority`, `cmdk`, `cn`, `date-fns`, `embla-carousel-react`, `input-otp`, `lucide-react`, `next`, `react`, `react-day-picker`, `react-dom`, `react-icons`, `react-resizable-panels`, `recharts`, `shadcn`, `shiki`, `sonner`, `tw-animate-css`.
+Runtime packages: `@base-ui/react`, `@better-auth/mongo-adapter`, `@shadcn/react`, `axios`, `better-auth`, `class-variance-authority`, `cmdk`, `cn`, `date-fns`, `embla-carousel-react`, `framer-motion`, `input-otp`, `lucide-react`, `mongodb`, `next`, `next-themes`, `react`, `react-day-picker`, `react-dom`, `react-icons`, `react-resizable-panels`, `recharts`, `shadcn`, `shiki`, `sonner`, `tw-animate-css`.
 
 Development packages: `@tailwindcss/turbopack`, `@types/node`, `@types/react`, `@types/react-dom`, `babel-plugin-react-compiler`, `eslint`, `eslint-config-next`, `tailwindcss`, `typescript`.
 
@@ -32,6 +41,11 @@ Development packages: `@tailwindcss/turbopack`, `@types/node`, `@types/react`, `
 
 ## Deployment and test accounts
 
-The production URL and test credentials are not configured in this repository yet. Do not store credentials in this README; share them through a secure channel when available.
+| Item | Status |
+| --- | --- |
+| Live client URL | Not provided |
+| Admin test account | Not provided; share credentials through a secure channel, not source control |
+| Tutor test account | Not provided; share credentials through a secure channel, not source control |
+| Server repository | Not provided |
 
-Server repository: not configured yet.
+Add the deployed URL and server repository link before release. Never commit account passwords or other secrets.

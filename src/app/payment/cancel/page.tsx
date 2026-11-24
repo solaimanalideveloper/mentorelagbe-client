@@ -10,8 +10,8 @@ export default function PaymentCancelPage() {
         <h1 className="mt-5 font-heading text-2xl font-bold text-foreground">Checkout was cancelled</h1>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">No payment was completed. You can compare the plans and try again whenever you are ready.</p>
         <div className="mt-6 flex justify-center gap-3">
-          <Button size="lg" render={<Link href="/pricing" />}>View Pricing</Button>
-          <Button size="lg" variant="outline" render={<Link href="/" />}>Back to Home</Button>
+          <Button size="lg" nativeButton={false} render={<Link href="/pricing" />}>View Pricing</Button>
+          <Button size="lg" variant="outline" nativeButton={false} render={<Link href="/" />}>Back to Home</Button>
         </div>
       </section>
     </main>

@@ -56,7 +56,7 @@ export default function StudentDashboardPage() {
     <div className="mx-auto max-w-7xl space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <DashboardTitle title="Student Dashboard" description="Keep up with your applications and learning plan." />
-        <Button size="lg" render={<Link href="/tuitions" />}>Browse Tuitions</Button>
+        <Button size="lg" nativeButton={false} render={<Link href="/tuitions" />}>Browse Tuitions</Button>
       </div>
       {errorMessage && <p role="alert" className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">{errorMessage}</p>}
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Student statistics">
@@ -68,7 +68,7 @@ export default function StudentDashboardPage() {
       <section className="rounded-xl border border-border bg-card p-5 shadow-sm sm:p-6">
         <h2 className="font-heading text-lg font-semibold">Your learning activity</h2>
         <p className="mt-2 text-sm text-muted-foreground">Review tutor responses and manage your pending applications.</p>
-        <Button className="mt-4" variant="outline" render={<Link href="/dashboard/student/my-applications" />}>View My Applications</Button>
+        <Button className="mt-4" variant="outline" nativeButton={false} render={<Link href="/dashboard/student/my-applications" />}>View My Applications</Button>
       </section>
     </div>
   );

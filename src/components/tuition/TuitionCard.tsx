@@ -1,18 +1,21 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatTaka } from "@/lib/data";
+import { BookmarkButton } from "@/components/tuition/BookmarkButton";
 import type { Tuition } from "@/types";
 
 export function TuitionCard({ tuition }: { tuition: Tuition }) {
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm">
       {tuition.bannerImage ? (
-        // The API can return arbitrary ImgBB URLs; use a normal image to avoid a remote-host build dependency.
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+        <Image
           src={tuition.bannerImage}
-          alt=""
+          alt={`${tuition.title} tuition`}
+          width={1280}
+          height={720}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           className="aspect-video w-full object-cover"
         />
       ) : (
@@ -28,6 +31,9 @@ export function TuitionCard({ tuition }: { tuition: Tuition }) {
           <span className="rounded-full bg-muted px-2.5 py-1 text-muted-foreground">
             {tuition.classLevel}
           </span>
+        </div>
+        <div className="mt-3 flex justify-end">
+          <BookmarkButton tuition={tuition} />
         </div>
         <h2 className="mt-3 line-clamp-2 font-heading text-lg font-semibold text-foreground">
           {tuition.title}

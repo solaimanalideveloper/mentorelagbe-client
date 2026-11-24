@@ -1,7 +1,9 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { TuitionCard } from "@/components/tuition/TuitionCard";
 import { TuitionFilters } from "@/components/tuition/TuitionFilters";
+import { BookmarkProvider } from "@/components/tuition/BookmarkProvider";
 import { Button } from "@/components/ui/button";
 import { isObject, isTuition } from "@/lib/data";
 import type { Tuition } from "@/types";
@@ -59,24 +61,59 @@ async function getTuitionPage(params: SearchParams): Promise<TuitionResult> {
   }
 }
 
-async function getFilterOptions() {
+type FilterOptions = {
+  subjects: string[];
+  classLevels: string[];
+  error: string;
+};
+
+async function getFilterOptions(): Promise<FilterOptions> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!apiUrl) return { subjects: [], classLevels: [] };
+  if (!apiUrl) {
+    return {
+      subjects: [],
+      classLevels: [],
+      error: "Filter options need NEXT_PUBLIC_API_URL configured.",
+    };
+  }
   try {
     const response = await fetch(`${apiUrl}/api/tuitions/filters`, { cache: "no-store" });
-    if (!response.ok) return { subjects: [], classLevels: [] };
+    if (!response.ok) {
+      return {
+        subjects: [],
+        classLevels: [],
+        error: `Could not load tuition filters (HTTP ${response.status}).`,
+      };
+    }
     const data: unknown = await response.json();
-    if (!isObject(data)) return { subjects: [], classLevels: [] };
+    if (
+      !isObject(data) ||
+      !Array.isArray(data.subjects) ||
+      !data.subjects.every((item) => typeof item === "string") ||
+      !Array.isArray(data.classLevels) ||
+      !data.classLevels.every((item) => typeof item === "string")
+    ) {
+      return {
+        subjects: [],
+        classLevels: [],
+        error: "The server returned invalid tuition filter options.",
+      };
+    }
     return {
-      subjects: Array.isArray(data.subjects) ? data.subjects.filter((item): item is string => typeof item === "string") : [],
-      classLevels: Array.isArray(data.classLevels) ? data.classLevels.filter((item): item is string => typeof item === "string") : [],
+      subjects: data.subjects,
+      classLevels: data.classLevels,
+      error: "",
     };
-  } catch {
-    return { subjects: [], classLevels: [] };
+  } catch (error) {
+    return {
+      subjects: [],
+      classLevels: [],
+      error: error instanceof Error ? error.message : "Could not connect to the tuition filters.",
+    };
   }
 }
 
-export default async function TuitionsPage({
+async function TuitionBrowseContent({
   searchParams,
 }: {
   searchParams: Promise<SearchParams>;
@@ -97,7 +134,12 @@ export default async function TuitionsPage({
 
   return (
     <main className="mx-auto max-w-7xl space-y-8 px-4 py-12 sm:px-6 lg:px-8">
-      <SectionHeading title="Browse Tuitions" subtitle="Find the right tutor, subject, and schedule for your learning goals." />
+      <SectionHeading as="h1" title="Browse Tuitions" subtitle="Find the right tutor, subject, and schedule for your learning goals." />
+      {filters.error && (
+        <p role="alert" className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
+          {filters.error}
+        </p>
+      )}
       <TuitionFilters subjects={filters.subjects} classLevels={filters.classLevels} />
 
       {result.error ? (
@@ -109,21 +151,49 @@ export default async function TuitionsPage({
         </section>
       ) : (
         <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <BookmarkProvider>
           {result.tuitions.map((tuition) => <TuitionCard key={tuition._id} tuition={tuition} />)}
+          </BookmarkProvider>
         </section>
       )}
 
       {!result.error && result.totalPages > 1 && (
         <nav className="flex flex-wrap items-center justify-center gap-2" aria-label="Tuition pagination">
-          <Button variant="outline" disabled={result.page <= 1} render={<Link href={pageHref(result.page - 1)} />}>Previous</Button>
+          <Button variant="outline" nativeButton={false} disabled={result.page <= 1} render={<Link href={pageHref(result.page - 1)} />}>Previous</Button>
           {Array.from({ length: result.totalPages }, (_, index) => index + 1).map((page) => (
-            <Button key={page} variant={page === result.page ? "default" : "outline"} aria-current={page === result.page ? "page" : undefined} render={<Link href={pageHref(page)} />}>
+            <Button key={page} variant={page === result.page ? "default" : "outline"} nativeButton={false} aria-current={page === result.page ? "page" : undefined} render={<Link href={pageHref(page)} />}>
               {page}
             </Button>
           ))}
-          <Button variant="outline" disabled={result.page >= result.totalPages} render={<Link href={pageHref(result.page + 1)} />}>Next</Button>
+          <Button variant="outline" nativeButton={false} disabled={result.page >= result.totalPages} render={<Link href={pageHref(result.page + 1)} />}>Next</Button>
         </nav>
       )}
     </main>
+  );
+}
+
+function TuitionBrowseFallback() {
+  return (
+    <main className="mx-auto max-w-7xl space-y-8 px-4 py-12 sm:px-6 lg:px-8" role="status" aria-label="Loading tuitions">
+      <div className="h-16 max-w-2xl animate-pulse rounded-lg bg-muted" />
+      <div className="h-32 animate-pulse rounded-xl bg-muted" />
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {[1, 2, 3].map((item) => (
+          <div key={item} className="h-80 animate-pulse rounded-xl bg-muted" />
+        ))}
+      </div>
+    </main>
+  );
+}
+
+export default function TuitionsPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  return (
+    <Suspense fallback={<TuitionBrowseFallback />}>
+      <TuitionBrowseContent searchParams={searchParams} />
+    </Suspense>
   );
 }

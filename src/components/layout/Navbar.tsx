@@ -8,6 +8,7 @@ import { authClient } from "@/lib/auth-client";
 import { clearApiToken } from "@/lib/api";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import {
   Sheet,
   SheetClose,
@@ -16,6 +17,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
 
 const navItems = [
   { label: "Home", href: "/" },
@@ -95,71 +101,78 @@ export function Navbar() {
           <div className="hidden items-center gap-2 md:flex">
             {user && role ? (
               <>
+                <Avatar>
+                  <AvatarImage src={user.image || undefined} alt="" />
+                  <AvatarFallback>{user.name.slice(0, 1)}</AvatarFallback>
+                </Avatar>
                 <span className="max-w-36 truncate text-sm font-medium text-foreground">{user.name}</span>
                 <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold capitalize text-primary">{role}</span>
-                <Button variant="outline" size="lg" render={<Link href={`/dashboard/${role}`} />}>Dashboard</Button>
-                <Button variant="ghost" size="lg" render={<Link href="/dashboard/profile" />}>Update Profile</Button>
+                <Button variant="outline" size="lg" nativeButton={false} render={<Link href={`/dashboard/${role}`} />}>Dashboard</Button>
+                <Button variant="ghost" size="lg" nativeButton={false} render={<Link href="/dashboard/profile" />}>Update Profile</Button>
                 <Button variant="ghost" size="lg" onClick={() => void handleSignOut()}>Sign Out</Button>
               </>
             ) : (
               <>
-                <Button variant="ghost" size="lg" render={<Link href="/sign-in" />}>Sign In</Button>
-                <Button variant="default" size="lg" render={<Link href="/sign-up" />}>Sign Up</Button>
+                <Button variant="ghost" size="lg" nativeButton={false} render={<Link href="/sign-in" />}>Sign In</Button>
+                <Button variant="default" size="lg" nativeButton={false} render={<Link href="/sign-up" />}>Sign Up</Button>
               </>
             )}
           </div>
         )}
 
-        <Sheet>
-          <SheetTrigger
-            render={
-              <Button
-                variant="ghost"
-                size="icon-lg"
-                className="md:hidden"
-                aria-label="Open navigation menu"
-              />
-            }
-          >
-            <Menu className="size-5" aria-hidden="true" />
-          </SheetTrigger>
-          <SheetContent side="right" className="w-[min(85vw,320px)]">
-            <SheetHeader className="pr-12">
-              <SheetTitle>Navigation</SheetTitle>
-            </SheetHeader>
-            <div className="flex flex-col gap-1 px-4">
-              {navItems.map((item) => (
-                <SheetClose key={item.href} nativeButton={false} render={<Link href={item.href} />}>
-                  <span className="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted">
-                    {item.label}
-                  </span>
-                </SheetClose>
-              ))}
-            </div>
-            {user && role ? (
-              <div className="mt-auto space-y-2 border-t border-border p-4">
-                <p className="text-sm font-medium text-foreground">{user.name}</p>
-                <p className="text-xs capitalize text-muted-foreground">{role}</p>
-                <SheetClose nativeButton={false} render={<Link href={`/dashboard/${role}`} />}>
-                  <Button variant="default" size="lg" className="w-full">Dashboard</Button>
-                </SheetClose>
-                <SheetClose nativeButton={false} render={<Link href="/dashboard/profile" />}>
-                  <Button variant="outline" size="lg" className="w-full">Update Profile</Button>
-                </SheetClose>
-                <Button variant="ghost" size="lg" className="w-full" onClick={() => void handleSignOut()}>Sign Out</Button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Sheet>
+            <SheetTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon-lg"
+                  className="md:hidden"
+                  aria-label="Open navigation menu"
+                />
+              }
+            >
+              <Menu className="size-5" aria-hidden="true" />
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[min(85vw,320px)]">
+              <SheetHeader className="pr-12">
+                <SheetTitle>Navigation</SheetTitle>
+              </SheetHeader>
+              <div className="flex flex-col gap-1 px-4">
+                {navItems.map((item) => (
+                  <SheetClose key={item.href} nativeButton={false} render={<Link href={item.href} />}>
+                    <span className="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted">
+                      {item.label}
+                    </span>
+                  </SheetClose>
+                ))}
               </div>
-            ) : (
-              <div className="mt-auto grid grid-cols-2 gap-2 border-t border-border p-4">
-                <SheetClose nativeButton={false} render={<Link href="/sign-in" />}>
-                  <Button variant="outline" size="lg" className="w-full">Sign In</Button>
-                </SheetClose>
-                <SheetClose nativeButton={false} render={<Link href="/sign-up" />}>
-                  <Button variant="default" size="lg" className="w-full">Sign Up</Button>
-                </SheetClose>
-              </div>
-            )}
-          </SheetContent>
-        </Sheet>
+              {user && role ? (
+                <div className="mt-auto space-y-2 border-t border-border p-4">
+                  <p className="text-sm font-medium text-foreground">{user.name}</p>
+                  <p className="text-xs capitalize text-muted-foreground">{role}</p>
+                  <SheetClose nativeButton={false} render={<Link href={`/dashboard/${role}`} />}>
+                    <Button variant="default" size="lg" className="w-full">Dashboard</Button>
+                  </SheetClose>
+                  <SheetClose nativeButton={false} render={<Link href="/dashboard/profile" />}>
+                    <Button variant="outline" size="lg" className="w-full">Update Profile</Button>
+                  </SheetClose>
+                  <Button variant="ghost" size="lg" className="w-full" onClick={() => void handleSignOut()}>Sign Out</Button>
+                </div>
+              ) : (
+                <div className="mt-auto grid grid-cols-2 gap-2 border-t border-border p-4">
+                  <SheetClose nativeButton={false} render={<Link href="/sign-in" />}>
+                    <Button variant="outline" size="lg" className="w-full">Sign In</Button>
+                  </SheetClose>
+                  <SheetClose nativeButton={false} render={<Link href="/sign-up" />}>
+                    <Button variant="default" size="lg" className="w-full">Sign Up</Button>
+                  </SheetClose>
+                </div>
+              )}
+            </SheetContent>
+          </Sheet>
+        </div>
       </nav>
     </header>
   );

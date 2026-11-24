@@ -105,7 +105,7 @@ export default function PostTuitionPage() {
             <h2 className="font-heading font-semibold">Free plan post limit reached</h2>
             <p className="mt-1 text-sm text-muted-foreground">Upgrade to Pro to post unlimited tuitions.</p>
           </div>
-          <Button size="lg" render={<Link href="/pricing" />}>View Pro Plans</Button>
+          <Button size="lg" nativeButton={false} render={<Link href="/pricing" />}>View Pro Plans</Button>
         </section>
       )}
       <form className="grid gap-5 rounded-xl border border-border bg-card p-5 shadow-sm sm:grid-cols-2 sm:p-6" onSubmit={(event) => void handleSubmit(event)}>

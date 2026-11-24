@@ -12,22 +12,28 @@ import { api } from "@/lib/api";
 import { getErrorMessage, isObject } from "@/lib/data";
 
 const plans = [
-  { name: "Student Pro", role: "student", price: "$10", description: "For learners who want the best fit.", features: ["Apply to available tuitions", "Track every application", "Access Pro learning features"] },
-  { name: "Tutor Pro", role: "tutor", price: "$15", description: "For tutors ready to grow their reach.", features: ["Unlimited tuition posts", "Manage all applicants", "Build your teaching profile"] },
-];
+  { name: "Student Free", role: "student", isPro: false, price: "$0", description: "Start exploring learning opportunities.", features: ["Browse approved tuitions", "Apply to suitable listings", "Track your applications"] },
+  { name: "Student Pro", role: "student", isPro: true, price: "$10", description: "For learners who want more from their journey.", features: ["Everything in Free", "Access Pro learning features", "Keep learning organized"] },
+  { name: "Tutor Free", role: "tutor", isPro: false, price: "$0", description: "Start teaching and meet new students.", features: ["Create up to 2 tuition posts", "Manage student applications", "Build your teaching profile"] },
+  { name: "Tutor Pro", role: "tutor", isPro: true, price: "$15", description: "For tutors ready to grow their teaching practice.", features: ["Everything in Free", "Unlimited tuition posts", "Manage applicants in one place"] },
+] as const;
 
 export default function PricingPage() {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
   const [checkoutRole, setCheckoutRole] = useState("");
 
-  async function subscribe() {
+  async function subscribe(targetRole: "student" | "tutor") {
     if (!session) {
       router.push("/sign-in");
       return;
     }
     if (session.user.plan === "pro") {
       toast.info("Your Pro plan is already active.");
+      return;
+    }
+    if (session.user.role !== targetRole) {
+      toast.error(`The ${targetRole} plan is only available to ${targetRole} accounts.`);
       return;
     }
     if (session.user.role !== "student" && session.user.role !== "tutor") {
@@ -55,15 +61,22 @@ export default function PricingPage() {
     <main className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
       <div className="mx-auto text-center">
         <div className="mx-auto flex size-12 items-center justify-center rounded-xl bg-accent/20 text-amber-700 dark:text-amber-300"><Crown aria-hidden="true" /></div>
-        <div className="mt-5 flex justify-center"><SectionHeading title="Simple plans for better learning" subtitle="Start free and upgrade when you are ready for more." /></div>
+        <div className="mt-5 flex justify-center"><SectionHeading as="h1" title="Simple plans for better learning" subtitle="Start free and upgrade when you are ready for more." /></div>
       </div>
-      <section className="mx-auto mt-10 grid max-w-4xl gap-5 md:grid-cols-2">
+      <section className="mx-auto mt-10 grid max-w-6xl gap-5 sm:grid-cols-2">
         {plans.map((plan) => {
           const isCurrentRole = session?.user.role === plan.role;
-          const isCurrentPlan = isCurrentRole && session?.user.plan === "pro";
+          const isCurrentPlan =
+            isCurrentRole &&
+            (plan.isPro ? session?.user.plan === "pro" : session?.user.plan !== "pro");
+          const isIncludedWithPro =
+            isCurrentRole && !plan.isPro && session?.user.plan === "pro";
           return (
             <article key={plan.name} className="flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
-              <p className="text-sm font-semibold text-primary">{plan.name}</p>
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-semibold text-primary">{plan.name}</p>
+                <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-medium capitalize text-muted-foreground">{plan.role}</span>
+              </div>
               <p className="mt-3 font-heading text-4xl font-bold text-foreground">{plan.price}<span className="text-sm font-normal text-muted-foreground"> / month</span></p>
               <p className="mt-3 text-sm text-muted-foreground">{plan.description}</p>
               <ul className="mt-6 flex-1 space-y-3">
@@ -72,11 +85,36 @@ export default function PricingPage() {
               <Button
                 size="lg"
                 className="mt-7 w-full"
-                variant={isCurrentPlan ? "outline" : "default"}
-                disabled={isPending || Boolean(checkoutRole) || isCurrentPlan || Boolean(session && !isCurrentRole)}
-                onClick={() => void subscribe()}
+                variant={isCurrentPlan ? "outline" : plan.isPro ? "default" : "outline"}
+                disabled={
+                  isPending ||
+                  Boolean(checkoutRole) ||
+                  isCurrentPlan ||
+                  isIncludedWithPro ||
+                  Boolean(session && !isCurrentRole) ||
+                  (plan.isPro && session?.user.role === "admin")
+                }
+                onClick={plan.isPro ? () => void subscribe(plan.role) : undefined}
+                nativeButton={plan.isPro || Boolean(session)}
+                render={
+                  !plan.isPro && !session
+                    ? <Link href="/sign-up" />
+                    : undefined
+                }
               >
-                {isPending ? "Checking account..." : isCurrentPlan ? "Current Plan" : checkoutRole ? "Opening checkout..." : "Subscribe with Stripe"}
+                {isPending
+                  ? "Checking account..."
+                  : isCurrentPlan
+                    ? "Current Plan"
+                    : checkoutRole
+                      ? "Opening checkout..."
+                      : plan.isPro
+                        ? "Subscribe with Stripe"
+                        : session?.user.plan === "pro"
+                          ? "Included with Pro"
+                          : session
+                            ? "Free Plan"
+                            : "Create Free Account"}
               </Button>
               {session && !isCurrentRole && <p className="mt-2 text-center text-xs text-muted-foreground">This plan is for {plan.role}s.</p>}
             </article>

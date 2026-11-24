@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   ArrowDownRight,
   ArrowRight,
@@ -21,23 +22,26 @@ import {
   Wallet,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BookmarkButton } from "@/components/tuition/BookmarkButton";
+import { BookmarkProvider } from "@/components/tuition/BookmarkProvider";
+import { SectionHeading } from "@/components/shared/SectionHeading";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { isTuition } from "@/lib/data";
+import type { Tuition } from "@/types";
+import { authClient } from "@/lib/auth-client";
+import { clearApiToken } from "@/lib/api";
+import { toast } from "sonner";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
 import {
   Sheet,
   SheetContent,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-
-type Tuition = {
-  _id: string;
-  title: string;
-  subject: string;
-  classLevel: string;
-  mode: "Online" | "Offline";
-  monthlyFee: number;
-  bannerImage?: string;
-  tutorName: string;
-};
 
 type FeaturedState =
   | { status: "loading" }
@@ -58,22 +62,6 @@ const subjects = [
   { name: "Programming", mark: "</>", tone: "bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300" },
   { name: "IELTS", mark: "I", tone: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300" },
 ];
-
-function isTuition(value: unknown): value is Tuition {
-  if (typeof value !== "object" || value === null) return false;
-  const item = value as Record<string, unknown>;
-
-  return (
-    typeof item._id === "string" &&
-    typeof item.title === "string" &&
-    typeof item.subject === "string" &&
-    typeof item.classLevel === "string" &&
-    (item.mode === "Online" || item.mode === "Offline") &&
-    typeof item.monthlyFee === "number" &&
-    typeof item.tutorName === "string" &&
-    (item.bannerImage === undefined || typeof item.bannerImage === "string")
-  );
-}
 
 async function fetchFeaturedTuitions(): Promise<FeaturedState> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -124,7 +112,26 @@ async function fetchFeaturedTuitions(): Promise<FeaturedState> {
   }
 }
 
-function HomeSidebar({ onNavigate }: { onNavigate?: () => void }) {
+type HomeUser = {
+  name: string;
+  role: "student" | "tutor" | "admin";
+};
+
+function isRole(value: unknown): value is HomeUser["role"] {
+  return value === "student" || value === "tutor" || value === "admin";
+}
+
+function HomeSidebar({
+  onNavigate,
+  user,
+  onSignOut,
+  isSigningOut,
+}: {
+  onNavigate?: () => void;
+  user?: HomeUser;
+  onSignOut?: () => void;
+  isSigningOut?: boolean;
+}) {
   return (
     <aside className="flex h-full flex-col border-r border-border bg-card">
       <Link
@@ -180,28 +187,60 @@ function HomeSidebar({ onNavigate }: { onNavigate?: () => void }) {
 
         <div>
           <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-            Get started
+            {user ? "Your account" : "Get started"}
           </p>
-          <Link
-            href="/sign-in"
-            onClick={onNavigate}
-            className="flex min-h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          >
-            <UsersRound className="size-4 shrink-0" aria-hidden="true" />
-            <span>Sign In</span>
-          </Link>
+          {user ? (
+            <>
+              <Link
+                href={`/dashboard/${user.role}`}
+                onClick={onNavigate}
+                className="flex min-h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                <LayoutDashboard className="size-4 shrink-0" aria-hidden="true" />
+                <span>Dashboard</span>
+              </Link>
+              <Link
+                href="/dashboard/profile"
+                onClick={onNavigate}
+                className="flex min-h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                <UsersRound className="size-4 shrink-0" aria-hidden="true" />
+                <span>Update Profile</span>
+              </Link>
+            </>
+          ) : (
+            <Link
+              href="/sign-in"
+              onClick={onNavigate}
+              className="flex min-h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              <UsersRound className="size-4 shrink-0" aria-hidden="true" />
+              <span>Sign In</span>
+            </Link>
+          )}
         </div>
       </nav>
 
       <div className="border-t border-border p-3">
-        <Button
-          nativeButton={false}
-          render={<Link href="/sign-up" onClick={onNavigate} />}
-          className="w-full"
-        >
-          Create Account
-          <ArrowRight aria-hidden="true" />
-        </Button>
+        {user ? (
+          <Button
+            variant="ghost"
+            onClick={onSignOut}
+            disabled={isSigningOut}
+            className="mb-2 w-full text-destructive hover:bg-destructive/10 hover:text-destructive"
+          >
+            {isSigningOut ? "Signing out..." : "Sign Out"}
+          </Button>
+        ) : (
+          <Button
+            nativeButton={false}
+            render={<Link href="/sign-up" onClick={onNavigate} />}
+            className="w-full"
+          >
+            Create Account
+            <ArrowRight aria-hidden="true" />
+          </Button>
+        )}
       </div>
     </aside>
   );
@@ -209,6 +248,30 @@ function HomeSidebar({ onNavigate }: { onNavigate?: () => void }) {
 
 function HomeWorkspaceShell({ children }: { children: ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const router = useRouter();
+  const { data: session, isPending } = authClient.useSession();
+  const user = session?.user;
+  const role = isRole(user?.role) ? user.role : null;
+  const sidebarUser = user && role ? { name: user.name, role } : undefined;
+
+  async function handleSignOut() {
+    setIsSigningOut(true);
+    try {
+      const result = await authClient.signOut();
+      if (result.error) {
+        toast.error(result.error.message || "Could not sign out.");
+        return;
+      }
+      clearApiToken();
+      toast.success("You have signed out.");
+      router.replace("/");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not sign out.");
+    } finally {
+      setIsSigningOut(false);
+    }
+  }
 
   return (
     <div className="flex min-h-screen bg-muted/40">
@@ -234,7 +297,12 @@ function HomeWorkspaceShell({ children }: { children: ReactNode }) {
               </SheetTrigger>
               <SheetContent side="left" className="w-[min(85vw,280px)] p-0">
                 <SheetTitle className="sr-only">Main navigation</SheetTitle>
-                <HomeSidebar onNavigate={() => setMobileMenuOpen(false)} />
+                <HomeSidebar
+                  onNavigate={() => setMobileMenuOpen(false)}
+                  user={sidebarUser}
+                  onSignOut={() => void handleSignOut()}
+                  isSigningOut={isSigningOut}
+                />
               </SheetContent>
             </Sheet>
             <p className="font-heading text-sm font-semibold text-foreground sm:text-base">
@@ -242,49 +310,68 @@ function HomeWorkspaceShell({ children }: { children: ReactNode }) {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="lg"
-              nativeButton={false}
-              render={<Link href="/sign-in" />}
-              className="hidden sm:inline-flex"
-            >
-              Sign In
-            </Button>
-            <Button
-              size="lg"
-              nativeButton={false}
-              render={<Link href="/sign-up" />}
-              className="hidden sm:inline-flex"
-            >
-              Join as Tutor
-            </Button>
-            <Link
-              href="/sign-in"
-              className="flex size-9 items-center justify-center rounded-full bg-primary/10 text-primary"
-              aria-label="Sign in to your account"
-            >
-              <UsersRound className="size-4" aria-hidden="true" />
-            </Link>
+            <ThemeToggle />
+            {!isPending && sidebarUser ? (
+              <>
+                <Avatar className="hidden sm:flex">
+                  <AvatarImage src={user?.image || undefined} alt="" />
+                  <AvatarFallback>{sidebarUser.name.slice(0, 1)}</AvatarFallback>
+                </Avatar>
+                <span className="hidden max-w-32 truncate text-sm font-medium text-foreground xl:inline">
+                  {sidebarUser.name}
+                </span>
+                <span className="hidden rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold capitalize text-primary md:inline-flex">
+                  {sidebarUser.role}
+                </span>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  nativeButton={false}
+                  render={<Link href={`/dashboard/${sidebarUser.role}`} />}
+                  className="hidden md:inline-flex"
+                >
+                  Dashboard
+                </Button>
+                <Link
+                  href={`/dashboard/${sidebarUser.role}`}
+                  className="flex size-9 items-center justify-center rounded-full bg-primary/10 text-primary md:hidden"
+                  aria-label="Open dashboard"
+                >
+                  <LayoutDashboard className="size-4" aria-hidden="true" />
+                </Link>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  size="lg"
+                  nativeButton={false}
+                  render={<Link href="/sign-in" />}
+                  className="hidden sm:inline-flex"
+                >
+                  Sign In
+                </Button>
+                <Button
+                  size="lg"
+                  nativeButton={false}
+                  render={<Link href="/sign-up" />}
+                  className="hidden sm:inline-flex"
+                >
+                  Join as Tutor
+                </Button>
+                <Link
+                  href="/sign-in"
+                  className="flex size-9 items-center justify-center rounded-full bg-primary/10 text-primary"
+                  aria-label="Sign in to your account"
+                >
+                  <UsersRound className="size-4" aria-hidden="true" />
+                </Link>
+              </>
+            )}
           </div>
         </header>
         <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
-    </div>
-  );
-}
-
-export function SectionHeading({
-  title,
-  subtitle,
-}: {
-  title: string;
-  subtitle: string;
-}) {
-  return (
-    <div className="max-w-2xl">
-      <h2 className="font-heading text-3xl font-bold text-foreground md:text-4xl">{title}</h2>
-      <p className="mt-2 text-sm leading-6 text-muted-foreground sm:text-base">{subtitle}</p>
     </div>
   );
 }
@@ -361,6 +448,7 @@ function HeroSection() {
           alt="Tutor and student learning together online"
           fill
           sizes="(max-width: 1024px) 100vw, 45vw"
+          loading="eager"
           className="object-contain p-2 sm:p-5"
         />
         <div className="absolute bottom-5 left-5 inline-flex items-center gap-2 rounded-xl border border-border bg-card/95 px-3 py-2 shadow-sm sm:bottom-8 sm:left-8">
@@ -379,6 +467,7 @@ function HeroSection() {
 
 function FeaturedTuitions() {
   const [state, setState] = useState<FeaturedState>({ status: "loading" });
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     let active = true;
@@ -410,7 +499,7 @@ function FeaturedTuitions() {
 
       {state.status === "loading" && (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {Array.from({ length: 3 }, (_, index) => (
+          {Array.from({ length: 6 }, (_, index) => (
             <div key={index} className="h-72 animate-pulse rounded-xl bg-card ring-1 ring-border" />
           ))}
         </div>
@@ -433,10 +522,15 @@ function FeaturedTuitions() {
       )}
 
       {state.status === "ready" && (
+        <BookmarkProvider>
         <div className="grid items-stretch gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {state.tuitions.map((tuition) => (
-            <article
+            <motion.article
               key={tuition._id}
+              initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: prefersReducedMotion ? 0 : 0.35 }}
               className="flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm"
             >
               <div className="relative aspect-video w-full bg-secondary">
@@ -449,6 +543,9 @@ function FeaturedTuitions() {
                 />
               </div>
               <div className="flex flex-1 flex-col p-5">
+                <div className="mb-2 flex justify-end">
+                  <BookmarkButton tuition={tuition} />
+                </div>
                 <div className="flex flex-wrap gap-2 text-xs">
                   <span className="rounded-full bg-primary/10 px-2.5 py-1 font-medium text-primary">
                     {tuition.subject}
@@ -478,15 +575,18 @@ function FeaturedTuitions() {
                   <ArrowRight aria-hidden="true" />
                 </Button>
               </div>
-            </article>
+            </motion.article>
           ))}
         </div>
+        </BookmarkProvider>
       )}
     </section>
   );
 }
 
 function HomeSections() {
+  const prefersReducedMotion = useReducedMotion();
+
   return (
     <>
       <section id="subjects" className="scroll-mt-24 py-10 md:py-12">
@@ -496,17 +596,24 @@ function HomeSections() {
             subtitle="Find focused support in the areas learners explore most."
           />
           <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4 lg:max-w-2xl">
-            {subjects.map((subject) => (
-              <Link
+            {subjects.map((subject, index) => (
+              <motion.div
                 key={subject.name}
-                href={`/tuitions?subject=${encodeURIComponent(subject.name)}`}
-                className="flex items-center gap-2.5 rounded-xl border border-border bg-card p-3 transition-colors hover:border-primary/40 hover:bg-primary/5"
+                initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: prefersReducedMotion ? 0 : 0.3, delay: index * 0.05 }}
               >
-                <span className={`flex size-9 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${subject.tone}`}>
-                  {subject.mark}
-                </span>
-                <span className="text-xs font-medium text-foreground sm:text-sm">{subject.name}</span>
-              </Link>
+                <Link
+                  href={`/tuitions?subject=${encodeURIComponent(subject.name)}`}
+                  className="flex items-center gap-2.5 rounded-xl border border-border bg-card p-3 transition-colors hover:border-primary/40 hover:bg-primary/5"
+                >
+                  <span className={`flex size-9 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${subject.tone}`}>
+                    {subject.mark}
+                  </span>
+                  <span className="text-xs font-medium text-foreground sm:text-sm">{subject.name}</span>
+                </Link>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -523,15 +630,22 @@ function HomeSections() {
             { number: "02", title: "Compare", detail: "Review tutor listings and tuition details.", icon: BookOpen },
             { number: "03", title: "Connect", detail: "Apply to a tuition that fits your goals.", icon: UsersRound },
             { number: "04", title: "Teach", detail: "Tutors can create and manage tuition posts.", icon: GraduationCap },
-          ].map(({ number, title, detail, icon: Icon }) => (
-            <article key={number} className="rounded-xl border border-border bg-card p-5">
+          ].map(({ number, title, detail, icon: Icon }, index) => (
+            <motion.article
+              key={number}
+              initial={prefersReducedMotion ? false : { opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: prefersReducedMotion ? 0 : 0.3, delay: index * 0.05 }}
+              className="rounded-xl border border-border bg-card p-5"
+            >
               <div className="flex items-center justify-between">
                 <span className="font-heading text-sm font-bold text-primary">{number}</span>
                 <Icon className="size-5 text-muted-foreground" aria-hidden="true" />
               </div>
               <h3 className="mt-5 font-heading text-lg font-semibold text-foreground">{title}</h3>
               <p className="mt-1 text-sm leading-5 text-muted-foreground">{detail}</p>
-            </article>
+            </motion.article>
           ))}
         </div>
       </section>
@@ -555,27 +669,40 @@ function HomeSections() {
         <div className="grid gap-4 lg:grid-cols-2">
           {[
             {
-              title: "Student Pro",
-              price: "$10",
-              description: "For students who want more from their learning journey.",
-              features: ["Apply to suitable tuitions", "Keep your learning organized", "Upgrade when you are ready"],
+              title: "Student plans",
+              free: "$0",
+              pro: "$10",
+              description: "Find a tutor and keep your learning journey organized.",
+              features: ["Browse approved tuitions", "Apply to suitable listings", "Pro learning features"],
             },
             {
-              title: "Tutor Pro",
-              price: "$15",
-              description: "For tutors who are ready to grow their teaching practice.",
-              features: ["Unlimited tuition posts", "Manage applicants in one place", "Showcase your teaching"],
+              title: "Tutor plans",
+              free: "$0",
+              pro: "$15",
+              description: "Start teaching and grow your reach when you are ready.",
+              features: ["Post up to 2 tuitions", "Manage student applications", "Unlimited posts with Pro"],
             },
-          ].map((plan) => (
-            <article key={plan.title} className="rounded-xl border border-border bg-card p-5 sm:p-6">
+          ].map((plan, index) => (
+            <motion.article
+              key={plan.title}
+              initial={prefersReducedMotion ? false : { opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: prefersReducedMotion ? 0 : 0.3, delay: index * 0.05 }}
+              className="rounded-xl border border-border bg-card p-5 sm:p-6"
+            >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <h3 className="font-heading text-lg font-semibold text-foreground">{plan.title}</h3>
                   <p className="mt-1 max-w-md text-sm text-muted-foreground">{plan.description}</p>
                 </div>
-                <p className="font-heading text-2xl font-bold text-foreground">
-                  {plan.price}
-                  <span className="text-xs font-normal text-muted-foreground"> / month</span>
+                <p className="text-right font-heading text-lg font-bold text-foreground">
+                  {plan.free}
+                  <span className="text-xs font-normal text-muted-foreground"> / month Free</span>
+                  <span className="mt-1 block text-2xl">
+                    {plan.pro}
+                    <span className="text-xs font-normal text-muted-foreground"> / month Pro</span>
+                  </span>
                 </p>
               </div>
               <ul className="mt-5 grid gap-2 sm:grid-cols-3">
@@ -589,13 +716,13 @@ function HomeSections() {
               <Button
                 variant="outline"
                 nativeButton={false}
-                render={<Link href="/sign-up" />}
+                render={<Link href="/pricing" />}
                 className="mt-5"
               >
-                Get started
+                View plans
                 <ArrowRight aria-hidden="true" />
               </Button>
-            </article>
+            </motion.article>
           ))}
         </div>
       </section>
