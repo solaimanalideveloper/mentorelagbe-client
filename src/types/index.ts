@@ -71,8 +71,8 @@ export type TutorStats = {
 };
 
 export type StudentStats = {
-  totalApplied: number;
+  total: number;
   accepted: number;
   pending: number;
-  currentPlan: Plan;
+  plan: Plan;
 };

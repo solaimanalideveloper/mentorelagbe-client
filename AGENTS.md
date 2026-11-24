@@ -281,7 +281,7 @@ Base: `NEXT_PUBLIC_API_URL`. Protected routes need `Authorization: Bearer <jwt>`
 | GET    | `/api/applications/my`                  | Student                       | My applications                                                                          |
 | GET    | `/api/applications/check/:tuitionId`    | Student                       | `{ applied: boolean }`                                                                   |
 | DELETE | `/api/applications/:id`                 | Student (owner, pending only) | Cancel                                                                                   |
-| GET    | `/api/student/stats`                    | Student                       | Overview stats                                                                           |
+| GET    | `/api/student/stats`                    | Student                       | `{ total, accepted, pending, plan }` overview stats                                      |
 | POST   | `/api/bookmarks/:tuitionId`             | Student                       | Toggle bookmark (optional)                                                               |
 | GET    | `/api/bookmarks`                        | Student                       | Saved tuitions (optional)                                                                |
 | POST   | `/api/reviews/:tuitionId`               | Student (accepted only)       | Rating 1–5 + feedback (optional)                                                         |
@@ -443,6 +443,9 @@ Project name, purpose, **live URL**, **Admin credentials**, tutor test credentia
 - 2026-11-20 — Configured the user-provided local backend URL (`http://localhost:8000`) in the ignored `.env.local` for local testing.
 - 2026-11-20 — Set Base UI `Button` link renders to `nativeButton={false}` to remove runtime warnings while preserving navigation behavior.
 - 2026-11-24 — Added persistent light/dark theme switching and student bookmark state using the existing API contract; kept testimonials and numeric subject counts unclaimed until real content is supplied.
+- 2026-11-24 — Matched the student dashboard stats type and display to the server response `{ total, accepted, pending, plan }`.
+- 2026-11-24 — Added a student-segment loading boundary so Next.js can render a useful instant-navigation fallback.
+- 2026-11-24 — Marked session-protected dashboard routes as non-instant at the server layout boundary and added route fallbacks for redirects and admin navigation.
 
 ### Change Log
 
@@ -461,10 +464,12 @@ Project name, purpose, **live URL**, **Admin credentials**, tutor test credentia
 - 2026-11-20 — Set the local API base URL to the user-provided `http://localhost:8000` for upcoming backend testing — `.env.local`.
 - 2026-11-20 — Fixed Base UI runtime warning when button-styled navigation links render as anchors — `src/components/layout/Navbar.tsx`, `src/app/tuitions/page.tsx`, `src/app/error.tsx`, `src/app/not-found.tsx`, `src/app/dashboard/student/page.tsx`, `src/app/payment/cancel/page.tsx`, `src/app/dashboard/tutor/post-tuition/page.tsx`, `src/app/how-it-works/page.tsx`, `src/components/tuition/ApplyForm.tsx`, `src/components/payment/PaymentVerification.tsx`.
 - 2026-11-24 — Completed the student saved-tuitions page, added theme switching and reduced-motion-aware home animations, clarified Free/Pro pricing, streamed tuition data behind Suspense, and refreshed setup/package docs — `src/app/`, `src/components/`, `src/app/globals.css`, `next.config.ts`, `package.json`, `package-lock.json`, `README.md`.
+- 2026-11-24 — Fixed the student dashboard invalid-stats error and added its instant-navigation loading fallback — `src/app/dashboard/student/page.tsx`, `src/app/dashboard/student/loading.tsx`, `src/types/index.ts`, `AGENTS.md`.
+- 2026-11-24 — Resolved dashboard instant-navigation validation by moving the session guard under a server route-config wrapper, isolating the client redirect, and adding an admin fallback — `src/app/dashboard/layout.tsx`, `src/app/dashboard/DashboardLayoutClient.tsx`, `src/app/dashboard/page.tsx`, `src/app/dashboard/DashboardIndexClient.tsx`, `src/app/dashboard/admin/loading.tsx`, `AGENTS.md`.
 
 ### Open Questions / Blockers
 
 - (Agent: list anything needing the developer's input.)
-- A unique local student account was created during sign-up verification; session and API JWT work. The student dashboard stats request returns 404 (`/api/student/stats`). Rotate the MongoDB credential and auth/JWT secrets shared in chat.
+- A unique local student account was created during sign-up verification; session and API JWT work. The server implements `/api/student/stats` with `{ total, accepted, pending, plan }`, now reflected in the client. Rotate credentials previously shared in chat.
 - The configured local API at `http://localhost:8000` was unavailable during this turn, so live auth, saved-tuition API behavior, and protected dashboard reloads still need backend-backed verification.
 - Live URL, test-account credentials, and the server repository link were not provided; keep these values out of source control until they are available.

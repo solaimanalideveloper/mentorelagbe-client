@@ -11,7 +11,7 @@ import type { StudentStats } from "@/types";
 import Link from "next/link";
 
 const cards = [
-  { key: "totalApplied", label: "Total Applied", description: "Tuition applications sent", icon: BookOpenCheck },
+  { key: "total", label: "Total Applied", description: "Tuition applications sent", icon: BookOpenCheck },
   { key: "accepted", label: "Accepted", description: "Applications accepted by tutors", icon: CheckCircle2 },
   { key: "pending", label: "Pending", description: "Applications awaiting a response", icon: Clock3 },
 ] as const;
@@ -19,10 +19,10 @@ const cards = [
 function isStudentStats(value: unknown): value is StudentStats {
   if (!isObject(value)) return false;
   return (
-    typeof value.totalApplied === "number" &&
+    typeof value.total === "number" &&
     typeof value.accepted === "number" &&
     typeof value.pending === "number" &&
-    (value.currentPlan === "free" || value.currentPlan === "pro")
+    (value.plan === "free" || value.plan === "pro")
   );
 }
 
@@ -63,7 +63,7 @@ export default function StudentDashboardPage() {
         {cards.map(({ key, label, description, icon }) => (
           <MetricCard key={key} label={label} description={description} icon={icon} value={stats?.[key] ?? "—"} loading={isLoading} />
         ))}
-        <MetricCard label="Current Plan" description={stats?.currentPlan === "pro" ? "Pro learning plan active" : "Upgrade for Pro features"} icon={Crown} value={stats?.currentPlan ?? "—"} loading={isLoading} />
+        <MetricCard label="Current Plan" description={stats?.plan === "pro" ? "Pro learning plan active" : "Upgrade for Pro features"} icon={Crown} value={stats?.plan ?? "—"} loading={isLoading} />
       </section>
       <section className="rounded-xl border border-border bg-card p-5 shadow-sm sm:p-6">
         <h2 className="font-heading text-lg font-semibold">Your learning activity</h2>
