@@ -459,6 +459,7 @@ Project name, purpose, **live URL**, **Admin credentials**, tutor test credentia
 - 2026-11-26 — Isolated the tutor dashboard UI behind a server route wrapper and opted that route out of instant-navigation validation.
 - 2026-11-26 — Matched the tutor stats type and display to the server response `{ totalTuitions, activeApproved, totalApplicants, plan }`.
 - 2026-11-26 — Kept only the three client public settings in the ignored local `.env`; local API/site URLs remain for development, while production URLs belong in Vercel environment settings.
+- 2026-11-26 — Added the supplied live client and server deployment URLs to the README.
 - 2026-11-26 — Restarted the Next.js dev server after the tutor dashboard instant-navigation fix; the `/dashboard/tutor` route now returns HTTP 200 and the production build passes.
 
 ### Change Log
@@ -488,6 +489,7 @@ Project name, purpose, **live URL**, **Admin credentials**, tutor test credentia
 - 2026-11-26 — Fixed the tutor dashboard development insight by moving its client UI to `TutorDashboardClient.tsx` and setting `instant = false` in the server page wrapper — `src/app/dashboard/tutor/page.tsx`, `src/app/dashboard/tutor/TutorDashboardClient.tsx`, `AGENTS.md`.
 - 2026-11-26 — Matched the client tutor dashboard and API contract to the server's `{ totalTuitions, activeApproved, totalApplicants, plan }` response; lint and build pass — `src/types/index.ts`, `src/app/dashboard/tutor/TutorDashboardClient.tsx`, `AGENTS.md`.
 - 2026-11-26 — Removed server-only database/auth settings from the client `.env`, preserving its public client settings; documented local-versus-production environment ownership — `.env`, `AGENTS.md`.
+- 2026-11-26 — Documented the live client and Express server URLs and the production client API URL setting — `README.md`, `AGENTS.md`.
 
 ### Open Questions / Blockers
 

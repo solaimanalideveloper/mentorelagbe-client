@@ -21,9 +21,12 @@ Authentication and protected dashboard pages use the BetterAuth session and JWT 
 
 ## Live deployment
 
-Client: [https://mentorelagbe-client.vercel.app/](https://mentorelagbe-client.vercel.app/)
+Client: [https://mentorelagbe-client.vercel.app](https://mentorelagbe-client.vercel.app)
+
+Server: [https://mentorlagbe-server-55k4.vercel.app](https://mentorlagbe-server-55k4.vercel.app)
 
 Set `NEXT_PUBLIC_SITE_URL=https://mentorelagbe-client.vercel.app` in the Vercel Production environment, and add this origin to the Express server's credentialed CORS and BetterAuth `trustedOrigins`. Keep `NEXT_PUBLIC_SITE_URL=http://localhost:3000` in the local `.env` for local development.
+Set the client Vercel Production `NEXT_PUBLIC_API_URL` to the server URL above.
 
 ## Environment variables
 
@@ -51,7 +54,8 @@ Development packages: `@tailwindcss/turbopack`, `@types/node`, `@types/react`, `
 
 | Item | Status |
 | --- | --- |
-| Live client URL | [https://mentorelagbe-client.vercel.app/](https://mentorelagbe-client.vercel.app/) |
+| Live client URL | [https://mentorelagbe-client.vercel.app](https://mentorelagbe-client.vercel.app) |
+| Live server URL | [https://mentorlagbe-server-55k4.vercel.app](https://mentorlagbe-server-55k4.vercel.app) |
 | Admin test account | Not provided; share credentials through a secure channel, not source control |
 | Tutor test account | Not provided; share credentials through a secure channel, not source control |
 | Server repository | Not provided |
