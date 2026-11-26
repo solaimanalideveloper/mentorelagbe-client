@@ -275,7 +275,7 @@ Base: `NEXT_PUBLIC_API_URL`. Protected routes need `Authorization: Bearer <jwt>`
 | DELETE | `/api/tuitions/:id`                     | Tutor (owner)                 | Delete                                                                                   |
 | GET    | `/api/tutor/applicants`                 | Tutor                         | Applications to my tuitions                                                              |
 | PATCH  | `/api/applications/:id/status`          | Tutor (owner)                 | `accepted` / `rejected`                                                                  |
-| GET    | `/api/tutor/stats`                      | Tutor                         | `{ totalPosted, activeApproved, totalApplicants, currentPlan }` overview stats            |
+| GET    | `/api/tutor/stats`                      | Tutor                         | `{ totalTuitions, activeApproved, totalApplicants, plan }` overview stats                 |
 | POST   | `/api/applications`                     | Student                       | Apply (blocks duplicates, returns 409)                                                   |
 | GET    | `/api/applications/my`                  | Student                       | My applications                                                                          |
 | GET    | `/api/applications/check/:tuitionId`    | Student                       | `{ applied: boolean }`                                                                   |
@@ -457,6 +457,8 @@ Project name, purpose, **live URL**, **Admin credentials**, tutor test credentia
 - 2026-11-26 — Set the live site URL in the client Vercel Production environment and removed server-only MongoDB/BetterAuth variables from that project.
 - 2026-11-26 — Isolated the student dashboard UI behind a server route wrapper and opted that route out of instant-navigation validation.
 - 2026-11-26 — Isolated the tutor dashboard UI behind a server route wrapper and opted that route out of instant-navigation validation.
+- 2026-11-26 — Matched the tutor stats type and display to the server response `{ totalTuitions, activeApproved, totalApplicants, plan }`.
+- 2026-11-26 — Kept only the three client public settings in the ignored local `.env`; local API/site URLs remain for development, while production URLs belong in Vercel environment settings.
 - 2026-11-26 — Restarted the Next.js dev server after the tutor dashboard instant-navigation fix; the `/dashboard/tutor` route now returns HTTP 200 and the production build passes.
 
 ### Change Log
@@ -484,11 +486,15 @@ Project name, purpose, **live URL**, **Admin credentials**, tutor test credentia
 - 2026-11-26 — Set client Vercel Production `NEXT_PUBLIC_SITE_URL` and removed server-only production variables — `AGENTS.md`, Vercel client project.
 - 2026-11-26 — Fixed the student dashboard development insight by moving its client UI to `StudentDashboardClient.tsx` and setting `instant = false` in the server page wrapper — `src/app/dashboard/student/page.tsx`, `src/app/dashboard/student/StudentDashboardClient.tsx`, `AGENTS.md`.
 - 2026-11-26 — Fixed the tutor dashboard development insight by moving its client UI to `TutorDashboardClient.tsx` and setting `instant = false` in the server page wrapper — `src/app/dashboard/tutor/page.tsx`, `src/app/dashboard/tutor/TutorDashboardClient.tsx`, `AGENTS.md`.
+- 2026-11-26 — Matched the client tutor dashboard and API contract to the server's `{ totalTuitions, activeApproved, totalApplicants, plan }` response; lint and build pass — `src/types/index.ts`, `src/app/dashboard/tutor/TutorDashboardClient.tsx`, `AGENTS.md`.
+- 2026-11-26 — Removed server-only database/auth settings from the client `.env`, preserving its public client settings; documented local-versus-production environment ownership — `.env`, `AGENTS.md`.
 
 ### Open Questions / Blockers
 
 - (Agent: list anything needing the developer's input.)
 - A unique local student account was created during sign-up verification; session and API JWT work. The server implements `/api/student/stats` with `{ total, accepted, pending, plan }`, now reflected in the client. Rotate credentials previously shared in chat.
 - The configured local API at `http://localhost:8000` was unavailable during this turn, so live auth, saved-tuition API behavior, and protected dashboard reloads still need backend-backed verification.
+- Client/server tutor stats contract now matches: `{ totalTuitions, activeApproved, totalApplicants, plan }`.
+- Rotate the database, BetterAuth/JWT, and Stripe credentials that were pasted into the conversation; keep replacement values only in the server's private environment.
 - Verify production `NEXT_PUBLIC_API_URL` points to the deployed Express server; server runtime credentials belong only in the server Vercel project.
 - Admin/tutor test-account credentials and the server repository link were not provided; keep credentials out of source control until shared securely.

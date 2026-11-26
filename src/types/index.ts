@@ -64,10 +64,10 @@ export type Payment = {
 };
 
 export type TutorStats = {
-  totalPosted: number;
+  totalTuitions: number;
   activeApproved: number;
   totalApplicants: number;
-  currentPlan: Plan;
+  plan: Plan;
 };
 
 export type StudentStats = {

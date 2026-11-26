@@ -18,7 +18,7 @@ import { toast } from "sonner";
 
 const statCards = [
   {
-    key: "totalPosted",
+    key: "totalTuitions",
     label: "Total Tuitions",
     description: "All of your tuition listings",
     icon: BookOpen,
@@ -42,10 +42,10 @@ function isTutorStats(value: unknown): value is TutorStats {
   const stats = value as Record<string, unknown>;
 
   return (
-    typeof stats.totalPosted === "number" &&
+    typeof stats.totalTuitions === "number" &&
     typeof stats.activeApproved === "number" &&
     typeof stats.totalApplicants === "number" &&
-    (stats.currentPlan === "free" || stats.currentPlan === "pro")
+    (stats.plan === "free" || stats.plan === "pro")
   );
 }
 
@@ -156,11 +156,11 @@ export default function TutorDashboardClient() {
             <div className="mt-4 h-8 w-16 animate-pulse rounded bg-muted" />
           ) : (
             <p className="mt-3 font-heading text-2xl font-bold uppercase text-foreground">
-              {stats?.currentPlan ?? "—"}
+              {stats?.plan ?? "—"}
             </p>
           )}
           <p className="mt-auto pt-3 text-xs text-muted-foreground">
-            {stats?.currentPlan === "pro"
+            {stats?.plan === "pro"
               ? "Unlimited tuition posts unlocked"
               : "Upgrade for unlimited tuition posts"}
           </p>
@@ -208,7 +208,7 @@ export default function TutorDashboardClient() {
         </div>
       </section>
 
-      {!isLoading && stats?.currentPlan === "pro" && (
+      {!isLoading && stats?.plan === "pro" && (
         <section className="flex items-start gap-3 rounded-xl border border-primary/15 bg-primary/5 p-4 sm:p-5">
           <Crown className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
           <div>
