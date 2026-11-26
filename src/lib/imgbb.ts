@@ -18,11 +18,22 @@ export async function uploadImage(file: File): Promise<string> {
     { method: "POST", body: formData },
   );
 
+  const result: unknown = await response.json();
   if (!response.ok) {
+    if (
+      typeof result === "object" &&
+      result !== null &&
+      "error" in result &&
+      typeof result.error === "object" &&
+      result.error !== null &&
+      "message" in result.error &&
+      typeof result.error.message === "string"
+    ) {
+      throw new Error(`Image upload failed: ${result.error.message}`);
+    }
     throw new Error(`Image upload failed (HTTP ${response.status}).`);
   }
 
-  const result: unknown = await response.json();
   if (
     typeof result !== "object" ||
     result === null ||

@@ -14,7 +14,7 @@ MentorLagbe is a tuition and mentorship platform for students, tutors, and admin
 ## Local setup
 
 1. Install dependencies with `npm install`.
-2. Copy `.env.example` to `.env.local` and set the backend URL and any required public keys.
+2. Create an ignored `.env` file in the project root and set the required variables listed below.
 3. Run `npm run dev`, then open [http://localhost:3000](http://localhost:3000).
 
 Authentication and protected dashboard pages use the BetterAuth session and JWT endpoints hosted by the MentorLagbe server. Set `NEXT_PUBLIC_API_URL` to that server's base URL; the server must allow credentialed requests from `NEXT_PUBLIC_SITE_URL` and trust that site as an auth origin before sign-in or sign-up can work. The server must also implement the API contract documented in [AGENTS.md](./AGENTS.md).
@@ -26,6 +26,8 @@ Authentication and protected dashboard pages use the BetterAuth session and JWT 
 | `NEXT_PUBLIC_API_URL` | MentorLagbe server URL |
 | `NEXT_PUBLIC_IMGBB_API_KEY` | ImgBB image upload key |
 | `NEXT_PUBLIC_SITE_URL` | Client site URL |
+
+The local `.env` may also contain server-only authentication and database settings required by the local auth API. Keep all environment files private and out of version control.
 
 ## npm packages
 

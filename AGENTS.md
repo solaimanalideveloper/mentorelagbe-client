@@ -21,7 +21,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 1. **Read this file first, every session.** Then read the "Progress Log" (section 17).
 2. **After finishing any task, update section 17 (Progress Log)**: tick the checkbox, add a dated line under "Change Log", and record any decision under "Decisions". Never skip this.
 3. **Working site beats pretty site.** Deployment failure = score 0. Never leave `main` broken.
-4. **Never commit secrets.** `.env.local` is git-ignored. Only commit `.env.example` with empty values.
+4. **Never commit secrets.** `.env` is git-ignored and must never be committed.
 5. **Small, meaningful commits.** Minimum 20 commits on this repo. Use Conventional Commits:
    `feat: add tuition card component`, `fix: stop redirect on reload in private routes`, `style: align hero section`, `chore: add sonner toaster`. Suggest a commit message after every completed unit of work. Never one giant commit.
 6. **Do not invent API endpoints.** Only use endpoints in section 9. If one is missing, add it to section 9 and note it in the Change Log so the server agent can build it.
@@ -63,7 +63,7 @@ Every package used must be listed in README.md.
 
 ---
 
-## 3. Environment Variables (`.env.local`)
+## 3. Environment Variables (`.env`)
 
 ```
 NEXT_PUBLIC_API_URL=http://localhost:8000
@@ -71,7 +71,7 @@ NEXT_PUBLIC_IMGBB_API_KEY=
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-- Also create `.env.example` with the same keys, empty values.
+- Keep local environment variables in the ignored `.env` file. Do not commit environment files.
 - Never hardcode URLs or keys. Always read from `process.env`.
 - On Vercel, set the same variables with production values.
 
@@ -117,8 +117,7 @@ Define these as CSS variables in `globals.css` and map them in Tailwind/shadcn t
 
 ```
 mentorlagbe-client/
-├── .env.local  (git-ignored)
-├── .env.example
+├── .env  (git-ignored)
 ├── .gitignore
 ├── AGENTS.md
 ├── README.md
@@ -351,7 +350,7 @@ Payment     { _id, userEmail, userName, userRole, planName, amount, currency, tr
 4. Filtering/searching on the client → fails Challenge 1. Must be server-side.
 5. Cards with different heights → loses design marks.
 6. Using the old Twitter bird icon → loses marks.
-7. Committing `.env.local` → critical. Check `.gitignore` first.
+7. Committing `.env` → critical. Check `.gitignore` first.
 8. Hardcoding `localhost` URLs → breaks production.
 9. Letting Admin be chosen on sign-up → security hole.
 10. `next/image` host not configured → images crash the page.
@@ -448,6 +447,9 @@ Project name, purpose, **live URL**, **Admin credentials**, tutor test credentia
 - 2026-11-24 — Marked session-protected dashboard routes as non-instant at the server layout boundary and added route fallbacks for redirects and admin navigation.
 - 2026-11-24 — Split the admin dashboard into a server route wrapper and client UI, opting out the session-only route from Next.js instant-navigation validation.
 - 2026-11-24 — Added an admin route layout opt-out for Next.js instant-navigation validation, covering `/dashboard/admin/users`, `/dashboard/admin/tuitions`, and `/dashboard/admin/transactions`.
+- 2026-11-24 — Diagnosed image upload failure as missing/invalid `NEXT_PUBLIC_IMGBB_API_KEY`; improved ImgBB error reporting to surface API validation messages.
+- 2026-11-24 — Added the user-provided ImgBB API key to ignored local environment and verified a successful upload; no key was added to tracked files.
+- 2026-11-26 — Consolidated local environment settings in ignored `.env` and removed `.env.local` and `.env.example` as requested.
 
 ### Change Log
 
@@ -468,6 +470,7 @@ Project name, purpose, **live URL**, **Admin credentials**, tutor test credentia
 - 2026-11-24 — Completed the student saved-tuitions page, added theme switching and reduced-motion-aware home animations, clarified Free/Pro pricing, streamed tuition data behind Suspense, and refreshed setup/package docs — `src/app/`, `src/components/`, `src/app/globals.css`, `next.config.ts`, `package.json`, `package-lock.json`, `README.md`.
 - 2026-11-24 — Fixed the student dashboard invalid-stats error and added its instant-navigation loading fallback — `src/app/dashboard/student/page.tsx`, `src/app/dashboard/student/loading.tsx`, `src/types/index.ts`, `AGENTS.md`.
 - 2026-11-24 — Resolved dashboard instant-navigation validation by moving the session guard under a server route-config wrapper, isolating the client redirect, and adding an admin fallback — `src/app/dashboard/layout.tsx`, `src/app/dashboard/DashboardLayoutClient.tsx`, `src/app/dashboard/page.tsx`, `src/app/dashboard/DashboardIndexClient.tsx`, `src/app/dashboard/admin/loading.tsx`, `AGENTS.md`.
+- 2026-11-26 — Consolidated environment configuration in `.env`, removed the other local/template env files, and updated setup guidance — `.env`, `.env.local`, `.env.example`, `README.md`, `AGENTS.md`.
 
 ### Open Questions / Blockers
 
