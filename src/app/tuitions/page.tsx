@@ -5,6 +5,8 @@ import { TuitionCard } from "@/components/tuition/TuitionCard";
 import { TuitionFilters } from "@/components/tuition/TuitionFilters";
 import { BookmarkProvider } from "@/components/tuition/BookmarkProvider";
 import { Button } from "@/components/ui/button";
+import axios from "axios";
+import { publicApi } from "@/lib/api";
 import { isObject, isTuition } from "@/lib/data";
 import type { Tuition } from "@/types";
 
@@ -18,8 +20,7 @@ type TuitionResult = {
 };
 
 async function getTuitionPage(params: SearchParams): Promise<TuitionResult> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!apiUrl) {
+  if (!process.env.NEXT_PUBLIC_API_URL) {
     return { tuitions: [], page: 1, totalPages: 1, error: "NEXT_PUBLIC_API_URL is not configured." };
   }
 
@@ -31,11 +32,8 @@ async function getTuitionPage(params: SearchParams): Promise<TuitionResult> {
   query.set("limit", "9");
 
   try {
-    const response = await fetch(`${apiUrl}/api/tuitions?${query}`, { cache: "no-store" });
-    if (!response.ok) {
-      return { tuitions: [], page: 1, totalPages: 1, error: `Could not load tuitions (HTTP ${response.status}).` };
-    }
-    const result: unknown = await response.json();
+    const response = await publicApi.get<unknown>("/api/tuitions", { params: query });
+    const result = response.data;
     if (
       !isObject(result) ||
       !Array.isArray(result.data) ||
@@ -52,11 +50,16 @@ async function getTuitionPage(params: SearchParams): Promise<TuitionResult> {
       error: "",
     };
   } catch (error) {
+    const status = axios.isAxiosError(error) ? error.response?.status : undefined;
     return {
       tuitions: [],
       page: 1,
       totalPages: 1,
-      error: error instanceof Error ? error.message : "Could not connect to the tuition service.",
+      error: status
+        ? `Could not load tuitions (HTTP ${status}).`
+        : error instanceof Error
+          ? error.message
+          : "Could not connect to the tuition service.",
     };
   }
 }
@@ -68,8 +71,7 @@ type FilterOptions = {
 };
 
 async function getFilterOptions(): Promise<FilterOptions> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!apiUrl) {
+  if (!process.env.NEXT_PUBLIC_API_URL) {
     return {
       subjects: [],
       classLevels: [],
@@ -77,15 +79,8 @@ async function getFilterOptions(): Promise<FilterOptions> {
     };
   }
   try {
-    const response = await fetch(`${apiUrl}/api/tuitions/filters`, { cache: "no-store" });
-    if (!response.ok) {
-      return {
-        subjects: [],
-        classLevels: [],
-        error: `Could not load tuition filters (HTTP ${response.status}).`,
-      };
-    }
-    const data: unknown = await response.json();
+    const response = await publicApi.get<unknown>("/api/tuitions/filters");
+    const data = response.data;
     if (
       !isObject(data) ||
       !Array.isArray(data.subjects) ||
@@ -105,10 +100,15 @@ async function getFilterOptions(): Promise<FilterOptions> {
       error: "",
     };
   } catch (error) {
+    const status = axios.isAxiosError(error) ? error.response?.status : undefined;
     return {
       subjects: [],
       classLevels: [],
-      error: error instanceof Error ? error.message : "Could not connect to the tuition filters.",
+      error: status
+        ? `Could not load tuition filters (HTTP ${status}).`
+        : error instanceof Error
+          ? error.message
+          : "Could not connect to the tuition filters.",
     };
   }
 }

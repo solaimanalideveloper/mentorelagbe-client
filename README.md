@@ -27,11 +27,11 @@ Authentication and protected dashboard pages use the BetterAuth session and JWT 
 | `NEXT_PUBLIC_IMGBB_API_KEY` | ImgBB image upload key |
 | `NEXT_PUBLIC_SITE_URL` | Client site URL |
 
-The local `.env` may also contain server-only authentication and database settings required by the local auth API. Keep all environment files private and out of version control.
+Keep server-only authentication and database settings in the Express server repository, never in this client. The client `.env` should contain only the public settings listed above.
 
 ## npm packages
 
-Runtime packages: `@base-ui/react`, `@better-auth/mongo-adapter`, `@shadcn/react`, `axios`, `better-auth`, `class-variance-authority`, `cmdk`, `cn`, `date-fns`, `embla-carousel-react`, `framer-motion`, `input-otp`, `lucide-react`, `mongodb`, `next`, `next-themes`, `react`, `react-day-picker`, `react-dom`, `react-icons`, `react-resizable-panels`, `recharts`, `shadcn`, `shiki`, `sonner`, `tw-animate-css`.
+Runtime packages: `@base-ui/react`, `@shadcn/react`, `axios`, `better-auth`, `class-variance-authority`, `cmdk`, `cn`, `date-fns`, `embla-carousel-react`, `framer-motion`, `input-otp`, `lucide-react`, `next`, `next-themes`, `react`, `react-day-picker`, `react-dom`, `react-icons`, `react-resizable-panels`, `recharts`, `shadcn`, `shiki`, `sonner`, `tw-animate-css`.
 
 Development packages: `@tailwindcss/turbopack`, `@types/node`, `@types/react`, `@types/react-dom`, `babel-plugin-react-compiler`, `eslint`, `eslint-config-next`, `tailwindcss`, `typescript`.
 

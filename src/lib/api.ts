@@ -83,6 +83,11 @@ export const api = axios.create({
   withCredentials: true,
 });
 
+export const publicApi = axios.create({
+  baseURL: apiBaseUrl,
+  withCredentials: true,
+});
+
 api.interceptors.request.use(async (config) => {
   const token = await getApiToken();
   config.headers.set("Authorization", `Bearer ${token}`);

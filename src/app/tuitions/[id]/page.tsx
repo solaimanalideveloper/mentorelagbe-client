@@ -4,26 +4,33 @@ import { notFound } from "next/navigation";
 import { ApplyForm } from "@/components/tuition/ApplyForm";
 import { BookmarkButton } from "@/components/tuition/BookmarkButton";
 import { BookmarkProvider } from "@/components/tuition/BookmarkProvider";
+import axios from "axios";
+import { publicApi } from "@/lib/api";
 import { formatTaka, isObject, isTuition } from "@/lib/data";
 import type { Tuition } from "@/types";
 import Image from "next/image";
 
 async function getTuition(id: string): Promise<{ tuition: Tuition | null; error: string }> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!apiUrl) return { tuition: null, error: "NEXT_PUBLIC_API_URL is not configured." };
+  if (!process.env.NEXT_PUBLIC_API_URL) return { tuition: null, error: "NEXT_PUBLIC_API_URL is not configured." };
 
   try {
-    const response = await fetch(`${apiUrl}/api/tuitions/${encodeURIComponent(id)}`, { cache: "no-store" });
-    if (response.status === 404) notFound();
-    if (!response.ok) return { tuition: null, error: `Could not load this tuition (HTTP ${response.status}).` };
-    const data: unknown = await response.json();
+    const response = await publicApi.get<unknown>(`/api/tuitions/${encodeURIComponent(id)}`);
+    const data = response.data;
     const item = isObject(data) && "data" in data ? data.data : data;
     return isTuition(item)
       ? { tuition: item, error: "" }
       : { tuition: null, error: "The server returned an invalid tuition record." };
   } catch (error) {
-    if (error instanceof Error && error.message === "NEXT_HTTP_ERROR_FALLBACK;404") throw error;
-    return { tuition: null, error: error instanceof Error ? error.message : "Could not connect to the tuition service." };
+    if (axios.isAxiosError(error) && error.response?.status === 404) notFound();
+    const status = axios.isAxiosError(error) ? error.response?.status : undefined;
+    return {
+      tuition: null,
+      error: status
+        ? `Could not load this tuition (HTTP ${status}).`
+        : error instanceof Error
+          ? error.message
+          : "Could not connect to the tuition service.",
+    };
   }
 }
 

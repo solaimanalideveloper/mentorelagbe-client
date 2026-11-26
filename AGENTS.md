@@ -399,6 +399,8 @@ Project name, purpose, **live URL**, **Admin credentials**, tutor test credentia
 - [x] Footer (X logo)
 - [x] Sign up / Sign in
 - [x] JWT token flow + axios interceptor
+- [x] BetterAuth client-only integration; auth and MongoDB remain on Express
+- [x] Client data requests use the shared Express API client
 - [x] Route guard (reload-safe)
 - [x] Home page layout, hero, featured tuitions, pricing, how it works, and subjects
 - [ ] Home page real testimonials and subject counters
@@ -450,6 +452,7 @@ Project name, purpose, **live URL**, **Admin credentials**, tutor test credentia
 - 2026-11-24 — Diagnosed image upload failure as missing/invalid `NEXT_PUBLIC_IMGBB_API_KEY`; improved ImgBB error reporting to surface API validation messages.
 - 2026-11-24 — Added the user-provided ImgBB API key to ignored local environment and verified a successful upload; no key was added to tracked files.
 - 2026-11-26 — Consolidated local environment settings in ignored `.env` and removed `.env.local` and `.env.example` as requested.
+- 2026-11-26 — Kept BetterAuth as an Express API client only; MongoDB persistence and auth routes belong to the server, and public tuition reads use the shared API client. Removed Mongo adapter packages as direct dependencies; BetterAuth still includes its adapter transitively.
 
 ### Change Log
 
@@ -471,6 +474,7 @@ Project name, purpose, **live URL**, **Admin credentials**, tutor test credentia
 - 2026-11-24 — Fixed the student dashboard invalid-stats error and added its instant-navigation loading fallback — `src/app/dashboard/student/page.tsx`, `src/app/dashboard/student/loading.tsx`, `src/types/index.ts`, `AGENTS.md`.
 - 2026-11-24 — Resolved dashboard instant-navigation validation by moving the session guard under a server route-config wrapper, isolating the client redirect, and adding an admin fallback — `src/app/dashboard/layout.tsx`, `src/app/dashboard/DashboardLayoutClient.tsx`, `src/app/dashboard/page.tsx`, `src/app/dashboard/DashboardIndexClient.tsx`, `src/app/dashboard/admin/loading.tsx`, `AGENTS.md`.
 - 2026-11-26 — Consolidated environment configuration in `.env`, removed the other local/template env files, and updated setup guidance — `.env`, `.env.local`, `.env.example`, `README.md`, `AGENTS.md`.
+- 2026-11-26 — Removed client-owned BetterAuth/MongoDB server code and direct package dependencies; routed public tuition requests through `src/lib/api.ts` and clarified client/server environment ownership. BetterAuth retains a transitive Mongo adapter dependency. `npm run lint` and `npm run build` pass — `src/lib/auth.ts`, `src/app/api/auth/`, `src/lib/api.ts`, `src/components/home/HomeWorkspace.tsx`, `src/app/tuitions/`, `package.json`, `package-lock.json`, `README.md`, `AGENTS.md`.
 
 ### Open Questions / Blockers
 

@@ -1,5 +1,6 @@
 "use client";
 
+import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
@@ -29,7 +30,7 @@ import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { isTuition } from "@/lib/data";
 import type { Tuition } from "@/types";
 import { authClient } from "@/lib/auth-client";
-import { clearApiToken } from "@/lib/api";
+import { clearApiToken, publicApi } from "@/lib/api";
 import { toast } from "sonner";
 import {
   Avatar,
@@ -64,8 +65,7 @@ const subjects = [
 ];
 
 async function fetchFeaturedTuitions(): Promise<FeaturedState> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!apiUrl) {
+  if (!process.env.NEXT_PUBLIC_API_URL) {
     return {
       status: "error",
       message: "Featured tuitions need NEXT_PUBLIC_API_URL configured.",
@@ -73,18 +73,8 @@ async function fetchFeaturedTuitions(): Promise<FeaturedState> {
   }
 
   try {
-    const response = await fetch(`${apiUrl}/api/tuitions/featured`, {
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      return {
-        status: "error",
-        message: `Featured tuitions could not be loaded (HTTP ${response.status}).`,
-      };
-    }
-
-    const body: unknown = await response.json();
+    const response = await publicApi.get<unknown>("/api/tuitions/featured");
+    const body = response.data;
     const entries = Array.isArray(body)
       ? body
       : typeof body === "object" &&
@@ -104,10 +94,13 @@ async function fetchFeaturedTuitions(): Promise<FeaturedState> {
     return entries.length
       ? { status: "ready", tuitions: entries.slice(0, 6) }
       : { status: "empty" };
-  } catch {
+  } catch (error) {
+    const status = axios.isAxiosError(error) ? error.response?.status : undefined;
     return {
       status: "error",
-      message: "Featured tuitions are unavailable. Check your API connection and try again.",
+      message: status
+        ? `Featured tuitions could not be loaded (HTTP ${status}).`
+        : "Featured tuitions are unavailable. Check your API connection and try again.",
     };
   }
 }
