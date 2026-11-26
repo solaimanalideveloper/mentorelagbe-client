@@ -19,6 +19,12 @@ MentorLagbe is a tuition and mentorship platform for students, tutors, and admin
 
 Authentication and protected dashboard pages use the BetterAuth session and JWT endpoints hosted by the MentorLagbe server. Set `NEXT_PUBLIC_API_URL` to that server's base URL; the server must allow credentialed requests from `NEXT_PUBLIC_SITE_URL` and trust that site as an auth origin before sign-in or sign-up can work. The server must also implement the API contract documented in [AGENTS.md](./AGENTS.md).
 
+## Live deployment
+
+Client: [https://mentorelagbe-client.vercel.app/](https://mentorelagbe-client.vercel.app/)
+
+Set `NEXT_PUBLIC_SITE_URL=https://mentorelagbe-client.vercel.app` in the Vercel Production environment, and add this origin to the Express server's credentialed CORS and BetterAuth `trustedOrigins`. Keep `NEXT_PUBLIC_SITE_URL=http://localhost:3000` in the local `.env` for local development.
+
 ## Environment variables
 
 | Variable | Purpose |
@@ -45,9 +51,9 @@ Development packages: `@tailwindcss/turbopack`, `@types/node`, `@types/react`, `
 
 | Item | Status |
 | --- | --- |
-| Live client URL | Not provided |
+| Live client URL | [https://mentorelagbe-client.vercel.app/](https://mentorelagbe-client.vercel.app/) |
 | Admin test account | Not provided; share credentials through a secure channel, not source control |
 | Tutor test account | Not provided; share credentials through a secure channel, not source control |
 | Server repository | Not provided |
 
-Add the deployed URL and server repository link before release. Never commit account passwords or other secrets.
+Add the server repository link before release. Never commit account passwords or other secrets.

@@ -73,7 +73,7 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
 - Keep local environment variables in the ignored `.env` file. Do not commit environment files.
 - Never hardcode URLs or keys. Always read from `process.env`.
-- On Vercel, set the same variables with production values.
+- On Vercel, set the same variables with production values. Set `NEXT_PUBLIC_SITE_URL=https://mentorelagbe-client.vercel.app` for Production; keep the local `.env` site URL at `http://localhost:3000`.
 
 ---
 
@@ -331,7 +331,7 @@ Payment     { _id, userEmail, userName, userRole, planName, amount, currency, tr
 ## 12. Deployment (Vercel) — Score 0 if broken
 
 - Set all env vars in Vercel. `NEXT_PUBLIC_API_URL` must point to the deployed server (https).
-- Add the deployed client URL to the server's CORS and BetterAuth `trustedOrigins`.
+- Add `https://mentorelagbe-client.vercel.app` to the server's CORS and BetterAuth `trustedOrigins`.
 - `next.config.ts` `images.remotePatterns` must include every external image host.
 - Build must pass locally: `npm run build` with zero TypeScript/ESLint errors before every push to main.
 - **Deploy a minimal version on day 1.** Redeploy often.
@@ -393,7 +393,7 @@ Project name, purpose, **live URL**, **Admin credentials**, tutor test credentia
 
 ### Checklist
 
-- [ ] Repo created, `.gitignore` correct, first deploy live
+- [x] Repo created, `.gitignore` correct, first deploy live
 - [x] Theme tokens, fonts, Toaster
 - [x] Navbar
 - [x] Footer (X logo)
@@ -453,6 +453,11 @@ Project name, purpose, **live URL**, **Admin credentials**, tutor test credentia
 - 2026-11-24 — Added the user-provided ImgBB API key to ignored local environment and verified a successful upload; no key was added to tracked files.
 - 2026-11-26 — Consolidated local environment settings in ignored `.env` and removed `.env.local` and `.env.example` as requested.
 - 2026-11-26 — Kept BetterAuth as an Express API client only; MongoDB persistence and auth routes belong to the server, and public tuition reads use the shared API client. Removed Mongo adapter packages as direct dependencies; BetterAuth still includes its adapter transitively.
+- 2026-11-26 — Recorded the live client URL and clarified production site-origin configuration while preserving localhost for local development.
+- 2026-11-26 — Set the live site URL in the client Vercel Production environment and removed server-only MongoDB/BetterAuth variables from that project.
+- 2026-11-26 — Isolated the student dashboard UI behind a server route wrapper and opted that route out of instant-navigation validation.
+- 2026-11-26 — Isolated the tutor dashboard UI behind a server route wrapper and opted that route out of instant-navigation validation.
+- 2026-11-26 — Restarted the Next.js dev server after the tutor dashboard instant-navigation fix; the `/dashboard/tutor` route now returns HTTP 200 and the production build passes.
 
 ### Change Log
 
@@ -475,10 +480,15 @@ Project name, purpose, **live URL**, **Admin credentials**, tutor test credentia
 - 2026-11-24 — Resolved dashboard instant-navigation validation by moving the session guard under a server route-config wrapper, isolating the client redirect, and adding an admin fallback — `src/app/dashboard/layout.tsx`, `src/app/dashboard/DashboardLayoutClient.tsx`, `src/app/dashboard/page.tsx`, `src/app/dashboard/DashboardIndexClient.tsx`, `src/app/dashboard/admin/loading.tsx`, `AGENTS.md`.
 - 2026-11-26 — Consolidated environment configuration in `.env`, removed the other local/template env files, and updated setup guidance — `.env`, `.env.local`, `.env.example`, `README.md`, `AGENTS.md`.
 - 2026-11-26 — Removed client-owned BetterAuth/MongoDB server code and direct package dependencies; routed public tuition requests through `src/lib/api.ts` and clarified client/server environment ownership. BetterAuth retains a transitive Mongo adapter dependency. `npm run lint` and `npm run build` pass — `src/lib/auth.ts`, `src/app/api/auth/`, `src/lib/api.ts`, `src/components/home/HomeWorkspace.tsx`, `src/app/tuitions/`, `package.json`, `package-lock.json`, `README.md`, `AGENTS.md`.
+- 2026-11-26 — Added the verified live client URL to deployment/setup documentation and updated the live-deployment checklist — `README.md`, `AGENTS.md`.
+- 2026-11-26 — Set client Vercel Production `NEXT_PUBLIC_SITE_URL` and removed server-only production variables — `AGENTS.md`, Vercel client project.
+- 2026-11-26 — Fixed the student dashboard development insight by moving its client UI to `StudentDashboardClient.tsx` and setting `instant = false` in the server page wrapper — `src/app/dashboard/student/page.tsx`, `src/app/dashboard/student/StudentDashboardClient.tsx`, `AGENTS.md`.
+- 2026-11-26 — Fixed the tutor dashboard development insight by moving its client UI to `TutorDashboardClient.tsx` and setting `instant = false` in the server page wrapper — `src/app/dashboard/tutor/page.tsx`, `src/app/dashboard/tutor/TutorDashboardClient.tsx`, `AGENTS.md`.
 
 ### Open Questions / Blockers
 
 - (Agent: list anything needing the developer's input.)
 - A unique local student account was created during sign-up verification; session and API JWT work. The server implements `/api/student/stats` with `{ total, accepted, pending, plan }`, now reflected in the client. Rotate credentials previously shared in chat.
 - The configured local API at `http://localhost:8000` was unavailable during this turn, so live auth, saved-tuition API behavior, and protected dashboard reloads still need backend-backed verification.
-- Live URL, test-account credentials, and the server repository link were not provided; keep these values out of source control until they are available.
+- Verify production `NEXT_PUBLIC_API_URL` points to the deployed Express server; server runtime credentials belong only in the server Vercel project.
+- Admin/tutor test-account credentials and the server repository link were not provided; keep credentials out of source control until shared securely.
